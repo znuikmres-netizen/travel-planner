@@ -1,0 +1,2569 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>大阪・京都 6/22-6/25 旅遊規劃</title>
+    <style>:root {
+  --ivory: #fffaf0;
+  --cream: #fffdf7;
+  --coffee: #9d8265;
+  --coffee-deep: #5a4638;
+  --coffee-soft: #d6c3aa;
+  --taupe: #f1e6d7;
+  --taupe-strong: #e3d0b7;
+  --yellow: #ffd84d;
+  --yellow-deep: #e3a92b;
+  --rose: #d78473;
+  --ink: #3f3027;
+  --shadow: #bfa27d;
+  --line: #b39473;
+  font-family: "PingFang TC", "PingFang SC", "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--ink);
+  background: var(--ivory);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  color: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.doodle-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.72;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: 30px 42px 96px 136px;
+}
+
+.sticker {
+  background: rgba(255, 253, 247, 0.94);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 8px 8px 0 var(--shadow);
+}
+
+.side-nav {
+  position: fixed;
+  top: 92px;
+  left: 42px;
+  width: 76px;
+  padding: 10px 8px;
+  display: grid;
+  gap: 10px;
+}
+
+.side-nav button {
+  min-height: 58px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.side-nav button:hover,
+.side-nav button.active {
+  background: var(--yellow);
+  border-color: var(--yellow-deep);
+  box-shadow: 4px 4px 0 rgba(157, 130, 101, 0.42);
+}
+
+.side-nav button.active {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--coffee-soft);
+}
+
+.workspace {
+  width: min(1280px, 100%);
+  margin: 0 auto;
+  min-width: 0;
+}
+
+.page-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.page-header p {
+  margin: 0 0 4px;
+  color: var(--coffee);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(30px, 3.8vw, 42px);
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: 0;
+}
+
+.page-header h1 span {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.outline-button,
+.ghost-button,
+.outline-link,
+.link-button {
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: var(--cream);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.outline-button {
+  padding: 12px 16px;
+  box-shadow: 4px 4px 0 var(--coffee-soft);
+}
+
+.grid-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(390px, 1.08fr);
+  gap: 20px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.card {
+  padding: 20px;
+  min-height: 246px;
+  min-width: 0;
+}
+
+.card.is-focused {
+  outline: 3px solid var(--yellow-deep);
+  outline-offset: 4px;
+  box-shadow: 11px 11px 0 var(--yellow-deep), 16px 16px 0 var(--shadow);
+  transform: translate(-2px, -2px);
+}
+
+.itinerary-card {
+  grid-column: span 2;
+  min-height: 430px;
+}
+
+.expense-card {
+  min-height: 430px;
+}
+
+.maps-card {
+  grid-column: span 1;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card-title h2 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.card-title span,
+.doodle-chip {
+  color: var(--coffee);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.ghost-button {
+  padding: 8px 10px;
+  color: var(--coffee-deep);
+}
+
+.date-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px 4px 12px;
+  scrollbar-width: thin;
+}
+
+.date-tab {
+  min-width: 132px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 247, 0.95);
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(191, 162, 125, 0.45);
+}
+
+.date-tab strong,
+.date-tab span {
+  display: block;
+}
+
+.date-tab strong {
+  font-size: 15px;
+  font-weight: 950;
+}
+
+.date-tab span {
+  color: var(--coffee);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.date-tab.active {
+  background: var(--yellow);
+  border-color: var(--yellow-deep);
+}
+
+.itinerary-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.46fr);
+  gap: 18px;
+  align-items: stretch;
+  margin-top: 8px;
+  min-width: 0;
+}
+
+.timeline {
+  min-height: 300px;
+  min-width: 0;
+}
+
+.timeline-row {
+  display: grid;
+  grid-template-columns: 58px 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-height: 47px;
+}
+
+.time {
+  padding-top: 2px;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.rail {
+  position: relative;
+  min-height: 50px;
+}
+
+.rail::before {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 17px;
+  bottom: -10px;
+  width: 2px;
+  background: var(--coffee-soft);
+}
+
+.timeline-row:last-child .rail::before {
+  display: none;
+}
+
+.rail span {
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 5px 0 0 4px;
+  border: 2px solid var(--coffee);
+  border-radius: 50%;
+  background: var(--taupe);
+}
+
+.stop-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.stop-title strong {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stop-title em {
+  flex: 0 0 auto;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--taupe);
+  color: var(--coffee-deep);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.stop-copy p {
+  margin: 3px 0 0;
+  color: var(--coffee);
+  font-size: 12px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.map-box {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.map-box img {
+  width: 100%;
+  aspect-ratio: 1.28;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.map-box a,
+.outline-link {
+  display: block;
+  padding: 10px 12px;
+  text-align: center;
+  font-weight: 950;
+}
+
+.rate-line,
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--coffee-deep);
+  font-size: 14px;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.rate-line small,
+.rate-drawer p span {
+  display: block;
+  margin-top: 2px;
+  color: var(--coffee);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.money-display {
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.money-display label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 8px 14px;
+  color: var(--coffee);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.money-display label + label {
+  border-top: 1.5px solid var(--coffee-soft);
+}
+
+.money-display strong {
+  color: var(--ink);
+  font-size: clamp(26px, 3vw, 38px);
+  line-height: 1;
+}
+
+.money-display label:last-child strong {
+  color: #c96b28;
+}
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+}
+
+.calc-grid button,
+.mini-keys button {
+  min-height: 46px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--cream);
+  box-shadow: 3px 3px 0 rgba(157, 130, 101, 0.45);
+  font-size: 24px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.calc-grid button.equals,
+.primary {
+  border: 1.5px solid var(--yellow-deep);
+  border-radius: 8px;
+  background: var(--yellow);
+  box-shadow: 4px 4px 0 var(--shadow);
+  color: var(--ink);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.primary {
+  padding: 11px 14px;
+  font-size: 17px;
+}
+
+.check-list {
+  display: grid;
+  gap: 8px;
+}
+
+.check-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 24px;
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.check-row label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.check-row span {
+  overflow-wrap: anywhere;
+}
+
+.check-row input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--coffee);
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.row-actions button {
+  min-height: 28px;
+  border: 1.5px solid var(--line);
+  border-radius: 7px;
+  background: var(--cream);
+  color: var(--coffee-deep);
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.maps-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 168px;
+  gap: 12px;
+}
+
+.place-list,
+.route-panel {
+  border: 1.5px solid var(--coffee-soft);
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.7);
+  padding: 11px;
+}
+
+.place-row,
+.ledger-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 5px 0;
+  border-top: 1px dashed var(--coffee-soft);
+  font-weight: 850;
+}
+
+.place-row span,
+.ledger-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.place-row em,
+.ledger-row em {
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--taupe);
+  color: var(--coffee-deep);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.ledger-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.place-row .row-actions,
+.ledger-row .row-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-start;
+}
+
+.route-panel {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.route-panel h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.route-panel label {
+  display: grid;
+  gap: 6px;
+  color: var(--coffee);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.route-panel select,
+.modal input,
+.modal textarea {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--cream);
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.route-panel select,
+.modal input {
+  min-height: 38px;
+  padding: 7px 9px;
+}
+
+.route-doodle {
+  position: relative;
+  height: 34px;
+  border: 1.5px dashed var(--line);
+  border-radius: 50%;
+}
+
+.route-doodle span {
+  position: absolute;
+  top: 12px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--coffee);
+}
+
+.route-doodle span:first-child {
+  left: 30px;
+}
+
+.route-doodle span:last-child {
+  right: 30px;
+}
+
+.route-doodle i {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 10px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--yellow);
+  transform: rotate(28deg);
+}
+
+.floating-rate,
+.bottom-add {
+  position: fixed;
+  z-index: 5;
+  cursor: pointer;
+}
+
+.floating-rate {
+  right: 38px;
+  bottom: 142px;
+  width: 88px;
+  height: 88px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--taupe);
+  box-shadow: 8px 8px 0 var(--shadow);
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.bottom-add {
+  left: 50%;
+  bottom: 24px;
+  width: min(680px, calc(100vw - 48px));
+  height: 62px;
+  border: 2px solid var(--yellow-deep);
+  background: var(--yellow);
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 950;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(90, 70, 56, 0.2);
+}
+
+.modal {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 24px;
+}
+
+.modal.compact {
+  width: min(460px, 100%);
+}
+
+.modal h2,
+.rate-drawer h2 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 950;
+}
+
+.modal p,
+.rate-drawer p {
+  margin: 0 0 14px;
+  color: var(--coffee);
+  font-weight: 850;
+}
+
+.modal textarea {
+  min-height: 140px;
+  padding: 12px;
+  resize: vertical;
+  margin-bottom: 14px;
+}
+
+.modal input {
+  margin-bottom: 12px;
+}
+
+.form-row {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  color: var(--coffee-deep);
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.form-row input,
+.form-row select,
+.form-check {
+  width: 100%;
+  min-height: 44px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--cream);
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.form-row input,
+.form-row select {
+  padding: 8px 10px;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 14px;
+}
+
+.form-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--coffee);
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 10px;
+}
+
+.danger {
+  min-height: 46px;
+  border: 1.5px solid var(--rose);
+  border-radius: 8px;
+  background: #fff3ee;
+  color: #8d4538;
+  box-shadow: 4px 4px 0 var(--coffee-soft);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--cream);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.wide {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.segmented button {
+  min-height: 40px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--cream);
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: var(--yellow);
+}
+
+.rate-drawer {
+  position: fixed;
+  right: 34px;
+  bottom: 244px;
+  z-index: 9;
+  width: 310px;
+  padding: 24px;
+}
+
+.mini-result {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.mini-result span {
+  color: var(--coffee);
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.mini-result strong {
+  color: #c96b28;
+  font-size: 34px;
+  font-weight: 950;
+}
+
+.mini-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.mini-keys button {
+  min-height: 42px;
+  font-size: 18px;
+}
+
+.empty-note {
+  border: 1.5px dashed var(--line);
+  border-radius: 8px;
+  padding: 22px;
+  color: var(--coffee);
+  font-weight: 900;
+}
+
+@media (max-width: 1100px) {
+  .app-shell {
+    padding: 24px 20px 108px;
+  }
+
+  .side-nav {
+    position: static;
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(70px, 1fr));
+    margin-bottom: 18px;
+    overflow-x: auto;
+  }
+
+  .side-nav button {
+    min-height: 46px;
+  }
+
+  .grid-board {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .expense-card,
+  .maps-card {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 1300px) and (min-width: 1101px) {
+  .app-shell {
+    padding: 26px 18px 96px 104px;
+  }
+
+  .side-nav {
+    left: 32px;
+    width: 72px;
+  }
+
+  .workspace {
+    width: min(900px, 100%);
+    margin: 0;
+  }
+
+  .page-header h1 {
+    font-size: 38px;
+  }
+
+  .outline-button {
+    padding: 10px 12px;
+  }
+
+  .grid-board {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 300px;
+    gap: 18px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .card-title h2 {
+    font-size: 27px;
+  }
+
+  .itinerary-card,
+  .expense-card {
+    min-height: 430px;
+  }
+
+  .date-tab {
+    min-width: 110px;
+  }
+
+  .itinerary-body {
+    grid-template-columns: minmax(0, 1fr) 198px;
+    gap: 14px;
+  }
+
+  .timeline-row {
+    grid-template-columns: 54px 22px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .money-display strong {
+    font-size: 28px;
+  }
+
+  .calc-grid button {
+    min-height: 43px;
+    font-size: 21px;
+  }
+
+  .maps-content {
+    grid-template-columns: 1fr;
+  }
+
+  .place-row:nth-of-type(n + 7) {
+    display: grid;
+  }
+}
+
+@media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  .app-shell {
+    padding: 10px 10px 156px;
+  }
+
+  .doodle-layer {
+    opacity: 0.5;
+  }
+
+  .workspace {
+    width: 100%;
+    margin: 0;
+  }
+
+  .page-header {
+    align-items: start;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+
+  .page-header p {
+    font-size: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 25px;
+  }
+
+  .page-header h1 span {
+    display: block;
+    margin: 2px 0 0;
+    font-size: 18px;
+  }
+
+  .header-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .outline-button {
+    min-height: 38px;
+    padding: 8px 9px;
+    font-size: 13px;
+  }
+
+  .grid-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .itinerary-body,
+  .maps-content {
+    grid-template-columns: 1fr;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .itinerary-card {
+    grid-column: 1 / -1;
+    order: 1;
+  }
+
+  .expense-card {
+    grid-column: 1 / -1;
+    order: 2;
+  }
+
+  .maps-card {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+
+  .check-card {
+    grid-column: span 1;
+    order: 4;
+  }
+
+  .card {
+    min-height: auto;
+    padding: 11px;
+    box-shadow: 5px 5px 0 var(--shadow);
+  }
+
+  .card.is-focused {
+    outline-width: 3px;
+    outline-offset: 2px;
+    box-shadow: 6px 6px 0 var(--yellow-deep), 10px 10px 0 var(--shadow);
+    transform: translate(-1px, -1px);
+  }
+
+  .card-title h2 {
+    font-size: 17px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .card-title {
+    align-items: center;
+    flex-direction: row;
+    gap: 7px;
+    margin-bottom: 8px;
+  }
+
+  .card-title .ghost-button {
+    width: auto;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .expense-card .card-title h2 {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .expense-card .card-title .ghost-button {
+    padding: 5px 6px;
+    font-size: 10px;
+  }
+
+  .maps-card .card-title {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .maps-card .card-title .ghost-button {
+    width: 100%;
+  }
+
+  .itinerary-card .card-title h2 {
+    font-size: 22px;
+  }
+
+  .date-tabs {
+    margin: 0 -4px;
+    padding-bottom: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    contain: layout paint;
+  }
+
+  .date-tab {
+    min-width: 102px;
+    padding: 8px 10px;
+  }
+
+  .date-tab strong {
+    font-size: 13px;
+  }
+
+  .date-tab span {
+    font-size: 11px;
+  }
+
+  .itinerary-body {
+    gap: 8px;
+  }
+
+  .timeline {
+    min-height: auto;
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 2px;
+  }
+
+  .timeline-row:nth-child(n + 6) {
+    display: none;
+  }
+
+  .timeline-row {
+    grid-template-columns: 42px 18px minmax(0, 1fr);
+    gap: 7px;
+    min-height: 44px;
+  }
+
+  .time {
+    font-size: 13px;
+  }
+
+  .rail {
+    min-height: 48px;
+  }
+
+  .rail span {
+    width: 12px;
+    height: 12px;
+    margin-left: 3px;
+  }
+
+  .stop-title {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .stop-title strong {
+    font-size: 14px;
+    white-space: normal;
+  }
+
+  .stop-title em {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .stop-copy p {
+    display: none;
+  }
+
+  .stop-copy .row-actions {
+    margin-top: 3px;
+  }
+
+  .map-box {
+    display: none;
+  }
+
+  .money-display label {
+    min-height: 42px;
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .money-display strong {
+    font-size: 20px;
+  }
+
+  .rate-line,
+  .list-head {
+    align-items: start;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .rate-line {
+    flex-direction: column;
+    margin-bottom: 7px;
+  }
+
+  .rate-line small {
+    font-size: 10px;
+  }
+
+  .expense-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+    column-gap: 10px;
+    align-items: start;
+    min-height: 244px;
+  }
+
+  .expense-card .card-title {
+    grid-column: 1 / -1;
+  }
+
+  .expense-card .rate-line,
+  .expense-card .money-display {
+    grid-column: 1;
+  }
+
+  .expense-card .money-display {
+    margin-bottom: 0;
+  }
+
+  .expense-card .calc-grid {
+    grid-column: 2;
+    grid-row: 2 / span 2;
+    align-self: stretch;
+  }
+
+  .calc-grid {
+    gap: 5px;
+  }
+
+  .calc-grid button {
+    min-height: 37px;
+    font-size: 16px;
+    box-shadow: 2px 2px 0 rgba(157, 130, 101, 0.45);
+  }
+
+  .check-list,
+  .place-list {
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .check-row {
+    grid-template-columns: 1fr;
+    padding: 3px 0 7px;
+    border-bottom: 1px dashed rgba(179, 148, 115, 0.45);
+    font-size: 12px;
+  }
+
+  .check-row .row-actions,
+  .place-row .row-actions,
+  .ledger-row .row-actions,
+  .stop-copy .row-actions {
+    justify-content: flex-start;
+  }
+
+  .place-list,
+  .route-panel {
+    padding: 8px;
+  }
+
+  .place-row,
+  .ledger-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 6px 0;
+    font-size: 12px;
+  }
+
+  .place-row em,
+  .ledger-row em {
+    padding: 2px 5px;
+    font-size: 10px;
+  }
+
+  .row-actions {
+    gap: 4px;
+  }
+
+  .row-actions button {
+    min-width: 28px;
+    min-height: 24px;
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .route-panel {
+    margin-top: 0;
+  }
+
+  .route-panel h3 {
+    font-size: 15px;
+  }
+
+  .route-doodle {
+    display: none;
+  }
+
+  .primary,
+  .outline-link {
+    min-height: 34px;
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  .maps-content {
+    grid-template-columns: minmax(0, 1fr) 128px;
+    gap: 8px;
+  }
+
+  .maps-card .card-title {
+    align-items: center;
+    flex-direction: row;
+  }
+
+  .maps-card .card-title .ghost-button {
+    width: auto;
+  }
+
+  .route-panel label {
+    font-size: 11px;
+  }
+
+  .side-nav {
+    position: fixed;
+    inset: auto 10px 10px;
+    z-index: 7;
+    width: auto;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: calc(100vw - 20px);
+    contain: layout paint;
+    padding: 8px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .side-nav button {
+    flex: 0 0 72px;
+    min-height: 48px;
+    scroll-snap-align: start;
+    font-size: 12px;
+  }
+
+  .floating-rate {
+    right: 14px;
+    bottom: 138px;
+    width: 58px;
+    height: 58px;
+    font-size: 14px;
+    box-shadow: 6px 6px 0 var(--shadow);
+  }
+
+  .bottom-add {
+    bottom: 72px;
+    width: calc(100vw - 24px);
+    height: 52px;
+    font-size: 21px;
+    box-shadow: 6px 6px 0 var(--shadow);
+  }
+
+  .rate-drawer {
+    right: 12px;
+    left: 12px;
+    bottom: 222px;
+    width: auto;
+    padding: 20px;
+  }
+
+  .modal-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: 86vh;
+    overflow-y: auto;
+    padding: 22px 18px 18px;
+  }
+
+  .modal h2,
+  .rate-drawer h2 {
+    font-size: 24px;
+  }
+
+  .segmented {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .modal-actions {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+  </head>
+  <body>
+    <img class="doodle-layer" src="./assets/doodles.png" alt="" aria-hidden="true" />
+    <div id="app"></div>
+    <script>const defaultExchangeRate = 0.19678;
+const defaultRateMeta = {
+  label: "央行最新可得",
+  date: "2026/06/05",
+  note: "NT$/USD 31.475 ÷ JPY/USD 159.95",
+};
+
+const initialDays = [
+  {
+    id: "d1",
+    label: "D1 大阪",
+    date: "6/22",
+    weekday: "日",
+    city: "大阪",
+    seed: { lat: 34.7055, lng: 135.4983 },
+  },
+  {
+    id: "d2",
+    label: "D2 京都",
+    date: "6/23",
+    weekday: "一",
+    city: "京都",
+    seed: { lat: 35.0116, lng: 135.7681 },
+  },
+  {
+    id: "d3",
+    label: "D3 大阪",
+    date: "6/24",
+    weekday: "二",
+    city: "大阪",
+    seed: { lat: 34.6654, lng: 135.4323 },
+  },
+  {
+    id: "d4",
+    label: "D4 大阪",
+    date: "6/25",
+    weekday: "三",
+    city: "大阪",
+    seed: { lat: 34.667, lng: 135.5038 },
+  },
+];
+
+const initialPlaces = [
+  {
+    id: "p1",
+    name: "大阪城天守閣",
+    city: "大阪",
+    area: "大阪城",
+    lat: 34.6873,
+    lng: 135.5262,
+    stay: 90,
+    tag: "城堡",
+    day: "d1",
+  },
+  {
+    id: "p2",
+    name: "心齋橋商店街",
+    city: "大阪",
+    area: "心齋橋",
+    lat: 34.6737,
+    lng: 135.5019,
+    stay: 120,
+    tag: "購物",
+    day: "d1",
+  },
+  {
+    id: "p3",
+    name: "道頓堀美食午餐",
+    city: "大阪",
+    area: "難波",
+    lat: 34.6687,
+    lng: 135.5011,
+    stay: 90,
+    tag: "美食",
+    day: "d1",
+  },
+  {
+    id: "p4",
+    name: "黑門市場",
+    city: "大阪",
+    area: "日本橋",
+    lat: 34.6655,
+    lng: 135.5063,
+    stay: 70,
+    tag: "市場",
+    day: "d1",
+  },
+  {
+    id: "p5",
+    name: "通天閣・新世界",
+    city: "大阪",
+    area: "新世界",
+    lat: 34.6525,
+    lng: 135.5063,
+    stay: 90,
+    tag: "景點",
+    day: "d1",
+  },
+  {
+    id: "p6",
+    name: "環球影城 USJ",
+    city: "大阪",
+    area: "此花",
+    lat: 34.6654,
+    lng: 135.4323,
+    stay: 420,
+    tag: "主題",
+    day: "d3",
+  },
+  {
+    id: "p7",
+    name: "梅田藍天大廈",
+    city: "大阪",
+    area: "梅田",
+    lat: 34.7053,
+    lng: 135.49,
+    stay: 75,
+    tag: "夜景",
+    day: "d4",
+  },
+  {
+    id: "p8",
+    name: "清水寺",
+    city: "京都",
+    area: "東山",
+    lat: 34.9949,
+    lng: 135.785,
+    stay: 90,
+    tag: "寺院",
+    day: "d2",
+  },
+  {
+    id: "p9",
+    name: "伏見稻荷大社",
+    city: "京都",
+    area: "伏見",
+    lat: 34.9671,
+    lng: 135.7727,
+    stay: 100,
+    tag: "神社",
+    day: "d2",
+  },
+  {
+    id: "p10",
+    name: "錦市場",
+    city: "京都",
+    area: "四條",
+    lat: 35.005,
+    lng: 135.7648,
+    stay: 80,
+    tag: "市場",
+    day: "d2",
+  },
+  {
+    id: "p11",
+    name: "八坂神社",
+    city: "京都",
+    area: "祇園",
+    lat: 35.0037,
+    lng: 135.7786,
+    stay: 60,
+    tag: "神社",
+    day: "d2",
+  },
+  {
+    id: "p12",
+    name: "嵐山竹林小徑",
+    city: "京都",
+    area: "嵐山",
+    lat: 35.017,
+    lng: 135.671,
+    stay: 110,
+    tag: "散步",
+    day: "d2",
+  },
+];
+
+const packingItems = [
+  ["passport", "護照 / 護照套", true],
+  ["ticket", "機票 / 行程單", true],
+  ["sim", "日本上網卡 / Wi-Fi機", true],
+  ["cash", "信用卡 / 現金(日幣)", true],
+  ["medicine", "常備藥品", false],
+  ["charger", "充電器 / 充電線", false],
+  ["umbrella", "雨傘 / 輕便外套", false],
+  ["skincare", "盥洗用品 / 保養品", false],
+];
+
+const souvenirItems = [
+  ["shiroi", "白色戀人", true],
+  ["royce", "ROYCE' 巧克力", true],
+  ["snacks", "薯條三兄弟", true],
+  ["yuzu", "柚子胡椒燒仙貝", false],
+  ["matcha", "祇園辻利 抹茶系列", false],
+  ["limited", "大阪限定 零食", false],
+  ["other", "其他：__________", false],
+];
+
+let state = {
+  tripTitle: "大阪・京都",
+  tripDates: "6/22-6/25",
+  exchangeRate: defaultExchangeRate,
+  rateMeta: { ...defaultRateMeta },
+  days: initialDays.map((day) => ({ ...day, seed: { ...day.seed } })),
+  activeDay: "d1",
+  activeSection: "home",
+  places: [...initialPlaces],
+  itinerary: {},
+  yenInput: "12800",
+  ledger: [
+    { id: "e1", title: "HARBS 蛋糕", yen: 1980, twd: 390, day: "D1" },
+    { id: "e2", title: "交通加值", yen: 3000, twd: 590, day: "D2" },
+  ],
+  packing: packingItems.map(([id, label, done]) => ({ id, label, done })),
+  souvenirs: souvenirItems.map(([id, label, done]) => ({ id, label, done })),
+  modal: null,
+  drawerOpen: false,
+  importText: "",
+  addKind: "spot",
+  addName: "",
+  addDetail: "",
+  editing: null,
+  editDraft: {},
+};
+
+function distance(a, b) {
+  const dx = (a.lat - b.lat) * 111;
+  const dy = (a.lng - b.lng) * 91;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function formatTime(minutes) {
+  const h = Math.floor(minutes / 60).toString().padStart(2, "0");
+  const m = (minutes % 60).toString().padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+function routePlaces(seed, places) {
+  const remaining = places.map((place) => ({ ...place }));
+  const ordered = [];
+  let cursor = seed;
+
+  while (remaining.length) {
+    remaining.sort((a, b) => distance(cursor, a) - distance(cursor, b));
+    const next = remaining.shift();
+    ordered.push(next);
+    cursor = next;
+  }
+
+  return ordered;
+}
+
+function guessDay(place) {
+  const text = `${place.name} ${place.area}`.toLowerCase();
+  if (place.city === "京都") return "d2";
+  if (/usj|環球|影城|此花/.test(text)) return "d3";
+  if (/梅田|中之島|大阪城|天滿|藍天/.test(text)) return "d1";
+  if (/難波|心齋|道頓|黑門|通天|新世界|天王寺|日本橋/.test(text)) return "d4";
+
+  const osakaDays = state.days.filter((day) => day.city === "大阪");
+  return osakaDays
+    .map((day) => ({ id: day.id, dist: distance(day.seed, place) }))
+    .sort((a, b) => a.dist - b.dist)[0].id;
+}
+
+function buildAutoItinerary(places) {
+  const byDay = Object.fromEntries(state.days.map((day) => [day.id, []]));
+
+  places.forEach((place) => {
+    const dayId = place.day || guessDay(place);
+    byDay[dayId].push(place);
+  });
+
+  const result = {};
+  state.days.forEach((day) => {
+    const ordered = routePlaces(day.seed, byDay[day.id]);
+    let cursor = 9 * 60;
+    result[day.id] = ordered.map((place, index) => {
+      const travel = index === 0 ? 15 : Math.max(8, Math.round(distance(ordered[index - 1], place) * 7));
+      cursor += index === 0 ? 0 : travel;
+      const start = cursor;
+      cursor += place.stay || 75;
+      return {
+        ...place,
+        time: formatTime(start),
+        travel,
+      };
+    });
+  });
+
+  return result;
+}
+
+state.itinerary = buildAutoItinerary(state.places);
+
+function getCurrentDay() {
+  return state.days.find((day) => day.id === state.activeDay);
+}
+
+function getCurrentStops() {
+  return state.itinerary[state.activeDay] || [];
+}
+
+function twdFromYen(value) {
+  const yen = Number(value || 0);
+  return Math.round(yen * state.exchangeRate);
+}
+
+function formatRate(value = state.exchangeRate) {
+  return Number(value).toFixed(5).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function rateSourceText() {
+  return `${state.rateMeta.label} ${state.rateMeta.date}`;
+}
+
+function mapsUrl(stops = getCurrentStops()) {
+  if (!stops.length) return "https://www.google.com/maps";
+  const encoded = stops.map((stop) => encodeURIComponent(`${stop.name} ${stop.city}`));
+  const origin = encoded[0];
+  const destination = encoded[encoded.length - 1];
+  const waypoints = encoded.slice(1, -1).join("%7C");
+  return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${
+    waypoints ? `&waypoints=${waypoints}` : ""
+  }&travelmode=walking`;
+}
+
+function setState(patch) {
+  state = { ...state, ...patch };
+  render();
+}
+
+function focusSection(section) {
+  setState({ activeSection: section });
+
+  requestAnimationFrame(() => {
+    if (section === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    document
+      .querySelector(`[data-section-card="${section}"]`)
+      ?.scrollIntoView({ block: "center", behavior: "smooth" });
+  });
+}
+
+function safe(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function fieldValue(key) {
+  return safe(state.editDraft[key] ?? "");
+}
+
+function openTripSettings() {
+  setState({
+    modal: "edit",
+    editing: { type: "trip" },
+    editDraft: {
+      tripTitle: state.tripTitle,
+      tripDates: state.tripDates,
+      exchangeRate: state.exchangeRate,
+    },
+  });
+}
+
+function openEdit(type, id, kind = "") {
+  if (type === "place") {
+    const place = state.places.find((item) => item.id === id);
+    if (!place) return;
+    setState({ modal: "edit", editing: { type, id }, editDraft: { ...place } });
+    return;
+  }
+
+  if (type === "expense") {
+    const entry = state.ledger.find((item) => item.id === id);
+    if (!entry) return;
+    setState({ modal: "edit", editing: { type, id }, editDraft: { ...entry } });
+    return;
+  }
+
+  if (type === "check") {
+    const item = state[kind]?.find((row) => row.id === id);
+    if (!item) return;
+    setState({ modal: "edit", editing: { type, id, kind }, editDraft: { ...item } });
+    return;
+  }
+
+  if (type === "day") {
+    const day = state.days.find((item) => item.id === id);
+    if (!day) return;
+    setState({ modal: "edit", editing: { type, id }, editDraft: { ...day } });
+  }
+}
+
+function deleteItem(type, id, kind = "") {
+  if (type === "place") {
+    const places = state.places.filter((item) => item.id !== id);
+    setState({ places, itinerary: buildAutoItinerary(places), modal: null });
+    return;
+  }
+
+  if (type === "expense") {
+    setState({ ledger: state.ledger.filter((item) => item.id !== id), modal: null });
+    return;
+  }
+
+  if (type === "check") {
+    setState({ [kind]: state[kind].filter((item) => item.id !== id), modal: null });
+  }
+}
+
+function saveEdit() {
+  const editing = state.editing;
+  if (!editing) return;
+  const draft = state.editDraft;
+
+  if (editing.type === "trip") {
+    setState({
+      tripTitle: draft.tripTitle?.trim() || state.tripTitle,
+      tripDates: draft.tripDates?.trim() || state.tripDates,
+      exchangeRate: Number(draft.exchangeRate) || state.exchangeRate,
+      rateMeta:
+        Number(draft.exchangeRate) && Number(draft.exchangeRate) !== state.exchangeRate
+          ? { label: "手動設定", date: "可編輯", note: "由旅程設定更新" }
+          : state.rateMeta,
+      modal: null,
+      editing: null,
+      editDraft: {},
+    });
+    return;
+  }
+
+  if (editing.type === "day") {
+    const days = state.days.map((day) =>
+      day.id === editing.id
+        ? {
+            ...day,
+            label: draft.label?.trim() || day.label,
+            date: draft.date?.trim() || day.date,
+            weekday: draft.weekday?.trim() || day.weekday,
+            city: draft.city?.trim() || day.city,
+          }
+        : day,
+    );
+    setState({ days, itinerary: buildAutoItinerary(state.places), modal: null, editing: null, editDraft: {} });
+    return;
+  }
+
+  if (editing.type === "place") {
+    const places = state.places.map((place) =>
+      place.id === editing.id
+        ? {
+            ...place,
+            name: draft.name?.trim() || place.name,
+            city: draft.city?.trim() || place.city,
+            area: draft.area?.trim() || place.area,
+            tag: draft.tag?.trim() || place.tag,
+            day: draft.day || place.day,
+            stay: Number(draft.stay) || place.stay,
+          }
+        : place,
+    );
+    setState({ places, itinerary: buildAutoItinerary(places), modal: null, editing: null, editDraft: {} });
+    return;
+  }
+
+  if (editing.type === "expense") {
+    const ledger = state.ledger.map((entry) =>
+      entry.id === editing.id
+        ? {
+            ...entry,
+            title: draft.title?.trim() || entry.title,
+            yen: Number(draft.yen) || entry.yen,
+            twd: twdFromYen(Number(draft.yen) || entry.yen),
+            day: draft.day?.trim() || entry.day,
+          }
+        : entry,
+    );
+    setState({ ledger, modal: "ledger", editing: null, editDraft: {} });
+    return;
+  }
+
+  if (editing.type === "check") {
+    const kind = editing.kind;
+    const rows = state[kind].map((item) =>
+      item.id === editing.id
+        ? {
+            ...item,
+            label: draft.label?.trim() || item.label,
+            done: Boolean(draft.done),
+          }
+        : item,
+    );
+    setState({ [kind]: rows, modal: null, editing: null, editDraft: {} });
+  }
+}
+
+function handleCalc(key) {
+  if (key === "back") {
+    setState({ yenInput: state.yenInput.slice(0, -1) || "0" });
+    return;
+  }
+  if (key === "clear") {
+    setState({ yenInput: "0" });
+    return;
+  }
+  if (key === "=") {
+    const yen = Number(state.yenInput || 0);
+    if (!yen) return;
+    const entry = {
+      id: `e${Date.now()}`,
+      title: `${getCurrentDay().label} 消費`,
+      yen,
+      twd: twdFromYen(yen),
+      day: getCurrentDay().label.split(" ")[0],
+    };
+    setState({ ledger: [entry, ...state.ledger], modal: "ledger" });
+    return;
+  }
+  if (["+", "-"].includes(key)) return;
+
+  const next = state.yenInput === "0" && key !== "." ? key : `${state.yenInput}${key}`;
+  if (/^\d{0,8}(\.\d{0,2})?$/.test(next)) setState({ yenInput: next });
+}
+
+function toggleChecklist(kind, id) {
+  const items = state[kind].map((item) => (item.id === id ? { ...item, done: !item.done } : item));
+  setState({ [kind]: items });
+}
+
+function parseImport(text) {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const [name, cityRaw, areaRaw, stayRaw] = line.split(",").map((part) => part?.trim());
+      const cityText = cityRaw || "";
+      const city = /京都|kyoto/i.test(cityText) ? "京都" : "大阪";
+      const base = city === "京都" ? { lat: 35.0116, lng: 135.7681 } : { lat: 34.6937, lng: 135.5023 };
+      return {
+        id: `i${Date.now()}${index}`,
+        name: name || `匯入景點 ${index + 1}`,
+        city,
+        area: areaRaw || city,
+        lat: base.lat + (index % 4) * 0.01 - 0.015,
+        lng: base.lng + (index % 5) * 0.012 - 0.018,
+        stay: Number(stayRaw) || 75,
+        tag: "匯入",
+      };
+    });
+}
+
+function importPlaces() {
+  const imported = parseImport(state.importText);
+  if (!imported.length) return;
+  const places = [...state.places, ...imported];
+  setState({
+    places,
+    itinerary: buildAutoItinerary(places),
+    importText: "",
+    modal: null,
+    activeSection: "maps",
+  });
+}
+
+function autoArrange() {
+  setState({
+    itinerary: buildAutoItinerary(state.places),
+    activeSection: "itinerary",
+    modal: "routeResult",
+  });
+}
+
+function addItem() {
+  const name = state.addName.trim();
+  if (!name) return;
+
+  if (state.addKind === "spot") {
+    const day = getCurrentDay();
+    const place = {
+      id: `n${Date.now()}`,
+      name,
+      city: day.city,
+      area: state.addDetail.trim() || day.city,
+      lat: day.seed.lat + Math.random() * 0.03 - 0.015,
+      lng: day.seed.lng + Math.random() * 0.03 - 0.015,
+      stay: 75,
+      tag: "新增",
+      day: day.id,
+    };
+    const places = [...state.places, place];
+    setState({
+      places,
+      itinerary: buildAutoItinerary(places),
+      addName: "",
+      addDetail: "",
+      modal: null,
+      activeSection: "maps",
+    });
+    return;
+  }
+
+  if (state.addKind === "expense") {
+    const yen = Number(state.addDetail) || Number(state.yenInput) || 0;
+    if (!yen) return;
+    const entry = {
+      id: `e${Date.now()}`,
+      title: name,
+      yen,
+      twd: twdFromYen(yen),
+      day: getCurrentDay().label.split(" ")[0],
+    };
+    setState({ ledger: [entry, ...state.ledger], addName: "", addDetail: "", modal: null });
+    return;
+  }
+
+  const key = state.addKind === "packing" ? "packing" : "souvenirs";
+  setState({
+    [key]: [...state[key], { id: `c${Date.now()}`, label: name, done: false }],
+    addName: "",
+    addDetail: "",
+    modal: null,
+  });
+}
+
+function cardClass(section, extra = "") {
+  return `card sticker ${extra} ${state.activeSection === section ? "is-focused" : ""}`;
+}
+
+function renderDateTabs() {
+  return state.days
+    .map(
+      (day) => `
+        <button class="date-tab ${state.activeDay === day.id ? "active" : ""}" data-action="day" data-day="${day.id}">
+          <strong>${day.label}</strong>
+          <span>${day.date} (${day.weekday})</span>
+        </button>
+      `,
+    )
+    .join("");
+}
+
+function renderTimeline() {
+  const stops = getCurrentStops();
+  if (!stops.length) {
+    return `<div class="empty-note">尚未排入景點，先從 Google Maps 收藏匯入。</div>`;
+  }
+
+  return stops
+    .map(
+      (stop, index) => `
+        <div class="timeline-row">
+          <div class="time">${stop.time}</div>
+          <div class="rail"><span></span></div>
+          <div class="stop-copy">
+            <div class="stop-title">
+              <strong>${safe(stop.name)}</strong>
+              <em>${safe(stop.tag)}</em>
+            </div>
+            <p>建議停留 ${Math.round((stop.stay || 75) / 30) / 2} 小時${
+              index ? ` · 前段車程約 ${stop.travel} 分` : ""
+            }</p>
+            <div class="row-actions">
+              <button data-action="edit" data-type="place" data-id="${stop.id}">編</button>
+              <button data-action="delete" data-type="place" data-id="${stop.id}">刪</button>
+            </div>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderLedger() {
+  return state.ledger
+    .map(
+      (entry) => `
+        <div class="ledger-row">
+          <span>${safe(entry.title)}</span>
+          <strong>¥${entry.yen.toLocaleString()}</strong>
+          <em>NT$${entry.twd.toLocaleString()}</em>
+          <div class="row-actions">
+            <button data-action="edit" data-type="expense" data-id="${entry.id}">編</button>
+            <button data-action="delete" data-type="expense" data-id="${entry.id}">刪</button>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderChecklist(kind) {
+  return state[kind]
+    .map(
+      (item) => `
+        <div class="check-row">
+          <label>
+            <input type="checkbox" ${item.done ? "checked" : ""} data-action="toggle" data-kind="${kind}" data-id="${item.id}" />
+            <span>${safe(item.label)}</span>
+          </label>
+          <div class="row-actions">
+            <button data-action="edit" data-type="check" data-kind="${kind}" data-id="${item.id}">編</button>
+            <button data-action="delete" data-type="check" data-kind="${kind}" data-id="${item.id}">刪</button>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderPlaces() {
+  return state.places
+    .map(
+      (place) => `
+        <div class="place-row">
+          <span>${safe(place.name)}</span>
+          <em>${safe(place.city)}</em>
+          <div class="row-actions">
+            <button data-action="edit" data-type="place" data-id="${place.id}">編</button>
+            <button data-action="delete" data-type="place" data-id="${place.id}">刪</button>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderEditModal() {
+  const editing = state.editing;
+  if (!editing) return "";
+
+  if (editing.type === "trip") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯旅程</h2>
+          <label class="form-row">旅程名稱<input data-edit-field="tripTitle" value="${fieldValue("tripTitle")}" /></label>
+          <label class="form-row">日期<input data-edit-field="tripDates" value="${fieldValue("tripDates")}" /></label>
+          <label class="form-row">匯率<input data-edit-field="exchangeRate" inputmode="decimal" value="${fieldValue("exchangeRate")}" /></label>
+          <button class="primary wide" data-action="saveEdit">儲存修改</button>
+        </section>
+      </div>
+    `;
+  }
+
+  if (editing.type === "day") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯日期</h2>
+          <label class="form-row">標籤<input data-edit-field="label" value="${fieldValue("label")}" /></label>
+          <label class="form-row">日期<input data-edit-field="date" value="${fieldValue("date")}" /></label>
+          <label class="form-row">星期<input data-edit-field="weekday" value="${fieldValue("weekday")}" /></label>
+          <label class="form-row">城市<input data-edit-field="city" value="${fieldValue("city")}" /></label>
+          <button class="primary wide" data-action="saveEdit">儲存修改</button>
+        </section>
+      </div>
+    `;
+  }
+
+  if (editing.type === "place") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯景點</h2>
+          <label class="form-row">名稱<input data-edit-field="name" value="${fieldValue("name")}" /></label>
+          <label class="form-row">城市<input data-edit-field="city" value="${fieldValue("city")}" /></label>
+          <label class="form-row">區域<input data-edit-field="area" value="${fieldValue("area")}" /></label>
+          <label class="form-row">分類<input data-edit-field="tag" value="${fieldValue("tag")}" /></label>
+          <label class="form-row">停留分鐘<input data-edit-field="stay" inputmode="numeric" value="${fieldValue("stay")}" /></label>
+          <label class="form-row">安排日期
+            <select data-edit-field="day">
+              ${state.days
+                .map(
+                  (day) =>
+                    `<option value="${day.id}" ${state.editDraft.day === day.id ? "selected" : ""}>${safe(day.label)} ${safe(day.date)}</option>`,
+                )
+                .join("")}
+            </select>
+          </label>
+          <div class="modal-actions">
+            <button class="danger" data-action="delete" data-type="place" data-id="${editing.id}">刪除</button>
+            <button class="primary" data-action="saveEdit">儲存修改</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (editing.type === "expense") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯記帳</h2>
+          <label class="form-row">名稱<input data-edit-field="title" value="${fieldValue("title")}" /></label>
+          <label class="form-row">日幣<input data-edit-field="yen" inputmode="numeric" value="${fieldValue("yen")}" /></label>
+          <label class="form-row">日期<input data-edit-field="day" value="${fieldValue("day")}" /></label>
+          <div class="modal-actions">
+            <button class="danger" data-action="delete" data-type="expense" data-id="${editing.id}">刪除</button>
+            <button class="primary" data-action="saveEdit">儲存修改</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (editing.type === "check") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯清單</h2>
+          <label class="form-row">項目<input data-edit-field="label" value="${fieldValue("label")}" /></label>
+          <label class="form-check"><input type="checkbox" data-edit-field="done" ${state.editDraft.done ? "checked" : ""} /> 已完成</label>
+          <div class="modal-actions">
+            <button class="danger" data-action="delete" data-type="check" data-kind="${editing.kind}" data-id="${editing.id}">刪除</button>
+            <button class="primary" data-action="saveEdit">儲存修改</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  return "";
+}
+
+function renderModal() {
+  if (state.modal === "edit") {
+    return renderEditModal();
+  }
+
+  if (state.modal === "import") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true" aria-labelledby="import-title">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2 id="import-title">匯入 Google Maps 收藏</h2>
+          <p>每行一個景點，可用：名稱, 城市, 區域, 停留分鐘。</p>
+          <textarea id="importText" placeholder="例：%0A大阪城天守閣, 大阪, 大阪城, 90%0A清水寺, 京都, 東山, 90">${state.importText}</textarea>
+          <button class="primary wide" data-action="importPlaces">匯入並重新排程</button>
+        </section>
+      </div>
+    `;
+  }
+
+  if (state.modal === "ledger") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker compact" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>記帳紀錄</h2>
+          <div class="ledger-list">${renderLedger()}</div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (state.modal === "add") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>新增</h2>
+          <div class="segmented">
+            ${[
+              ["spot", "景點"],
+              ["expense", "記帳"],
+              ["packing", "行李"],
+              ["souvenir", "伴手禮"],
+            ]
+              .map(
+                ([id, label]) =>
+                  `<button class="${state.addKind === id ? "active" : ""}" data-action="addKind" data-kind="${id}">${label}</button>`,
+              )
+              .join("")}
+          </div>
+          <input id="addName" value="${state.addName}" placeholder="${
+            state.addKind === "expense" ? "消費名稱" : state.addKind === "spot" ? "景點名稱" : "清單項目"
+          }" />
+          <input id="addDetail" value="${state.addDetail}" placeholder="${
+            state.addKind === "expense" ? "日幣金額" : state.addKind === "spot" ? "區域 / 備註" : "備註可留空"
+          }" />
+          <button class="primary wide" data-action="addItem">加入</button>
+        </section>
+      </div>
+    `;
+  }
+
+  if (state.modal === "routeResult") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker compact" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>順路排程完成</h2>
+          <p>${state.days
+            .map((day) => `${day.label}：${(state.itinerary[day.id] || []).length} 個景點`)
+            .join("　")}</p>
+          <a class="primary wide link-button" href="${mapsUrl()}" target="_blank" rel="noreferrer">打開目前日期路線</a>
+        </section>
+      </div>
+    `;
+  }
+
+  return "";
+}
+
+function renderDrawer() {
+  if (!state.drawerOpen) return "";
+  const yen = Number(state.yenInput || 0);
+  return `
+    <aside class="rate-drawer sticker" aria-label="浮動匯率計算機">
+      <button class="modal-close" data-action="toggleDrawer">收起</button>
+      <h2>匯率計算機</h2>
+      <p>JPY -> TWD · 匯率 ${formatRate()}<span>${rateSourceText()}</span></p>
+      <div class="mini-result">
+        <span>¥${yen.toLocaleString()}</span>
+        <strong>NT$${twdFromYen(yen).toLocaleString()}</strong>
+      </div>
+      <div class="mini-keys">
+        ${["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00", "back"]
+          .map((key) => `<button data-action="calc" data-key="${key}">${key === "back" ? "刪除" : key}</button>`)
+          .join("")}
+      </div>
+    </aside>
+  `;
+}
+
+function render() {
+  const currentDay = getCurrentDay();
+  const yen = Number(state.yenInput || 0);
+  const completePacking = state.packing.filter((item) => item.done).length;
+  const completeSouvenirs = state.souvenirs.filter((item) => item.done).length;
+
+  document.querySelector("#app").innerHTML = `
+    <main class="app-shell">
+      <nav class="side-nav sticker" aria-label="主要選單">
+        ${[
+          ["home", "首頁"],
+          ["itinerary", "行程表"],
+          ["expense", "記帳本"],
+          ["packing", "行李"],
+          ["souvenir", "伴手禮"],
+          ["maps", "地圖收藏"],
+          ["settings", "設定"],
+        ]
+          .map(
+            ([id, label]) =>
+              `<button class="${state.activeSection === id ? "active" : ""}" data-action="section" data-section="${id}"><span>${label}</span></button>`,
+          )
+          .join("")}
+      </nav>
+
+      <section class="workspace">
+        <header class="page-header">
+          <div>
+            <p>Travel Planner</p>
+            <h1>${safe(state.tripTitle)} <span>${safe(state.tripDates)}</span></h1>
+          </div>
+          <div class="header-actions">
+            <button class="outline-button" data-action="openTripSettings">編輯旅程</button>
+            <button class="outline-button" data-action="autoArrange">重新排程</button>
+          </div>
+        </header>
+
+        <section class="grid-board" aria-label="六宮格旅行規劃">
+          <article class="${cardClass("itinerary", "itinerary-card")}" data-section-card="itinerary">
+            <div class="card-title">
+              <h2>行程表</h2>
+              <button class="ghost-button" data-action="edit" data-type="day" data-id="${state.activeDay}">改日期</button>
+            </div>
+            <div class="date-tabs">${renderDateTabs()}</div>
+            <div class="itinerary-body">
+              <div class="timeline">${renderTimeline()}</div>
+              <div class="map-box">
+                <img src="./assets/map-preview.png" alt="順路排程地圖預覽" />
+                <a href="${mapsUrl()}" target="_blank" rel="noreferrer">在 Google Maps 打開路線</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="${cardClass("expense", "expense-card")}" data-section-card="expense">
+            <div class="card-title">
+              <h2>記帳本</h2>
+              <button class="ghost-button" data-action="openLedger">記帳紀錄</button>
+            </div>
+            <div class="rate-line">
+              <span>JPY -> TWD<small>${rateSourceText()}</small></span>
+              <strong>匯率 ${formatRate()}</strong>
+            </div>
+            <div class="money-display">
+              <label>JPY <strong>${yen.toLocaleString()}</strong></label>
+              <label>TWD <strong>${twdFromYen(yen).toLocaleString()}</strong></label>
+            </div>
+            <div class="calc-grid">
+              ${["7", "8", "9", "back", "4", "5", "6", "+", "1", "2", "3", "-", "0", "00", ".", "="]
+                .map(
+                  (key) =>
+                    `<button class="${key === "=" ? "equals" : ""}" data-action="calc" data-key="${key}">${key === "back" ? "刪" : key}</button>`,
+                )
+                .join("")}
+            </div>
+          </article>
+
+          <article class="${cardClass("packing", "check-card")}" data-section-card="packing">
+            <div class="card-title">
+              <h2>行李</h2>
+              <span>${completePacking}/${state.packing.length}</span>
+            </div>
+            <div class="check-list">${renderChecklist("packing")}</div>
+          </article>
+
+          <article class="${cardClass("souvenir", "check-card")}" data-section-card="souvenir">
+            <div class="card-title">
+              <h2>伴手禮</h2>
+              <span>${completeSouvenirs}/${state.souvenirs.length}</span>
+            </div>
+            <div class="check-list">${renderChecklist("souvenirs")}</div>
+          </article>
+
+          <article class="${cardClass("maps", "maps-card")}" data-section-card="maps">
+            <div class="card-title">
+              <h2>Google Maps 收藏</h2>
+              <button class="ghost-button" data-action="openImport">匯入景點</button>
+            </div>
+            <div class="maps-content">
+              <div class="place-list">
+                <div class="list-head">
+                  <span>已匯入景點 (${state.places.length} 個)</span>
+                  <strong>${currentDay.label}</strong>
+                </div>
+                ${renderPlaces()}
+              </div>
+              <div class="route-panel">
+                <h3>順路排程</h3>
+                <label>
+                  選擇日期
+                  <select data-action="selectDay">
+                    ${state.days
+                      .map(
+                        (day) =>
+                          `<option value="${day.id}" ${day.id === state.activeDay ? "selected" : ""}>${day.label} ${day.date}</option>`,
+                      )
+                      .join("")}
+                  </select>
+                </label>
+                <div class="route-doodle">
+                  <span></span><i></i><span></span>
+                </div>
+                <button class="primary" data-action="autoArrange">自動排程</button>
+                <a href="${mapsUrl()}" target="_blank" rel="noreferrer" class="outline-link">查看排程結果</a>
+              </div>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <button class="floating-rate" data-action="toggleDrawer">匯率</button>
+      <button class="bottom-add sticker" data-action="openAdd">+ 新增</button>
+      ${renderModal()}
+      ${renderDrawer()}
+    </main>
+  `;
+
+  requestAnimationFrame(() => {
+    document.querySelector(".date-tab.active")?.scrollIntoView({ block: "nearest", inline: "start" });
+  });
+}
+
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-action]");
+  if (!target) return;
+
+  const action = target.dataset.action;
+  if (action === "section") {
+    if (target.dataset.section === "settings") {
+      openTripSettings();
+    } else {
+      focusSection(target.dataset.section);
+    }
+  }
+  if (action === "day") setState({ activeDay: target.dataset.day, activeSection: "itinerary" });
+  if (action === "selectDay") return;
+  if (action === "calc") handleCalc(target.dataset.key);
+  if (action === "toggle") toggleChecklist(target.dataset.kind, target.dataset.id);
+  if (action === "openImport") setState({ modal: "import", activeSection: "maps" });
+  if (action === "importPlaces") importPlaces();
+  if (action === "autoArrange") autoArrange();
+  if (action === "openTripSettings") openTripSettings();
+  if (action === "openLedger") setState({ modal: "ledger", activeSection: "expense" });
+  if (action === "openAdd") setState({ modal: "add" });
+  if (action === "addKind") setState({ addKind: target.dataset.kind });
+  if (action === "addItem") addItem();
+  if (action === "edit") openEdit(target.dataset.type, target.dataset.id, target.dataset.kind);
+  if (action === "delete") deleteItem(target.dataset.type, target.dataset.id, target.dataset.kind);
+  if (action === "saveEdit") saveEdit();
+  if (action === "toggleDrawer") setState({ drawerOpen: !state.drawerOpen });
+  if (action === "closeModal" && event.target === target) setState({ modal: null });
+});
+
+document.addEventListener("change", (event) => {
+  const select = event.target.closest("select[data-action='selectDay']");
+  if (select) setState({ activeDay: select.value, activeSection: "maps" });
+
+  const editField = event.target.closest("[data-edit-field]");
+  if (editField) {
+    const value = editField.type === "checkbox" ? editField.checked : editField.value;
+    state.editDraft = { ...state.editDraft, [editField.dataset.editField]: value };
+  }
+});
+
+document.addEventListener("input", (event) => {
+  if (event.target.id === "importText") state.importText = event.target.value;
+  if (event.target.id === "addName") state.addName = event.target.value;
+  if (event.target.id === "addDetail") state.addDetail = event.target.value;
+  const editField = event.target.closest("[data-edit-field]");
+  if (editField) {
+    state.editDraft = { ...state.editDraft, [editField.dataset.editField]: editField.value };
+  }
+});
+
+render();
+</script>
+  </body>
+</html>
