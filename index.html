@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、伴手禮與 Google Maps 收藏順路排程 App"
+    />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #fffaf0;
@@ -982,7 +986,7 @@ a {
   }
 
   .app-shell {
-    padding: 10px 10px 156px;
+    padding: 10px 10px 196px;
   }
 
   .doodle-layer {
@@ -1378,7 +1382,7 @@ a {
 
   .floating-rate {
     right: 14px;
-    bottom: 138px;
+    bottom: calc(168px + env(safe-area-inset-bottom));
     width: 58px;
     height: 58px;
     font-size: 14px;
@@ -1386,7 +1390,7 @@ a {
   }
 
   .bottom-add {
-    bottom: 72px;
+    bottom: calc(100px + env(safe-area-inset-bottom));
     width: calc(100vw - 24px);
     height: 52px;
     font-size: 21px;
@@ -1765,9 +1769,66 @@ function mapsUrl(stops = getCurrentStops()) {
   }&travelmode=walking`;
 }
 
-function setState(patch) {
+const scrollSelectors = [".date-tabs", ".timeline", ".check-list", ".place-list", ".ledger-list", ".modal"];
+
+function captureScrollState() {
+  return {
+    x: window.scrollX,
+    y: window.scrollY,
+    elements: scrollSelectors.flatMap((selector) =>
+      Array.from(document.querySelectorAll(selector)).map((element, index) => ({
+        selector,
+        index,
+        left: element.scrollLeft,
+        top: element.scrollTop,
+      })),
+    ),
+  };
+}
+
+function syncActiveDateTab() {
+  const activeTab = document.querySelector(".date-tab.active");
+  const dateTabs = activeTab?.closest(".date-tabs");
+  if (!activeTab || !dateTabs) return;
+
+  const left = activeTab.offsetLeft;
+  const right = left + activeTab.offsetWidth;
+  const viewLeft = dateTabs.scrollLeft;
+  const viewRight = viewLeft + dateTabs.clientWidth;
+
+  if (left < viewLeft) {
+    dateTabs.scrollLeft = Math.max(left - 6, 0);
+  } else if (right > viewRight) {
+    dateTabs.scrollLeft = right - dateTabs.clientWidth + 6;
+  }
+}
+
+function restoreScrollState(snapshot, options = {}) {
+  requestAnimationFrame(() => {
+    snapshot.elements.forEach(({ selector, index, left, top }) => {
+      const element = document.querySelectorAll(selector)[index];
+      if (!element) return;
+      element.scrollLeft = left;
+      element.scrollTop = top;
+    });
+
+    window.scrollTo(snapshot.x, snapshot.y);
+    if (options.syncDateTabs) syncActiveDateTab();
+  });
+}
+
+function setState(patch, options = {}) {
+  const previousState = state;
+  const scrollSnapshot = options.preserveScroll === false ? null : captureScrollState();
   state = { ...state, ...patch };
   render();
+
+  const shouldSyncDateTabs = patch.activeDay && patch.activeDay !== previousState.activeDay;
+  if (scrollSnapshot) {
+    restoreScrollState(scrollSnapshot, { syncDateTabs: shouldSyncDateTabs });
+  } else if (shouldSyncDateTabs) {
+    requestAnimationFrame(syncActiveDateTab);
+  }
 }
 
 function focusSection(section) {
@@ -2513,9 +2574,6 @@ function render() {
     </main>
   `;
 
-  requestAnimationFrame(() => {
-    document.querySelector(".date-tab.active")?.scrollIntoView({ block: "nearest", inline: "start" });
-  });
 }
 
 document.addEventListener("click", (event) => {
@@ -2571,6 +2629,7 @@ document.addEventListener("input", (event) => {
 });
 
 render();
+requestAnimationFrame(syncActiveDateTab);
 </script>
   </body>
 </html>
