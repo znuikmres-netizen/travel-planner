@@ -7,6 +7,7 @@
       name="description"
       content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
+    <meta name="travel-planner-version" content="20260618-gray-tech-v2" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -1746,7 +1747,7 @@ a {
 </style>
   </head>
   <body>
-    <img class="background-layer" src="./assets/travel-tech-bg.png" alt="" aria-hidden="true" />
+    <img class="background-layer" src="./assets/travel-tech-bg.png?v=20260618-gray" alt="" aria-hidden="true" />
     <div id="app"></div>
     <script>const defaultExchangeRate = 0.19678;
 const defaultRateMeta = {
@@ -3102,7 +3103,7 @@ function render() {
       <section class="workspace">
         <header class="page-header">
           <div>
-            <p>Travel Planner</p>
+            <p>Travel Planner · 紫灰新版 2026/06/18</p>
             <h1>${safe(state.tripTitle)} <span>${safe(state.tripDates)}</span></h1>
           </div>
           <div class="header-actions">
@@ -3120,7 +3121,7 @@ function render() {
             <div class="itinerary-body">
               <div class="timeline">${renderTimeline()}</div>
               <div class="map-box">
-                <img src="./assets/map-preview.png" alt="順路排程地圖預覽" />
+                <img src="./assets/map-preview.png?v=20260618-gray" alt="順路排程地圖預覽" />
                 <a href="${mapsUrl()}" target="_blank" rel="noreferrer">在 Google Maps 打開路線</a>
               </div>
             </div>
