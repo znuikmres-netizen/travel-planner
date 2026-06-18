@@ -5,23 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、伴手禮與 Google Maps 收藏順路排程 App"
+      content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
-  --ivory: #fffaf0;
-  --cream: #fffdf7;
-  --coffee: #9d8265;
-  --coffee-deep: #5a4638;
-  --coffee-soft: #d6c3aa;
-  --taupe: #f1e6d7;
-  --taupe-strong: #e3d0b7;
-  --yellow: #ffd84d;
-  --yellow-deep: #e3a92b;
-  --rose: #d78473;
-  --ink: #3f3027;
-  --shadow: #bfa27d;
-  --line: #b39473;
+  --ivory: #f7f3f8;
+  --cream: #ffffff;
+  --coffee: #6e6472;
+  --coffee-deep: #27303f;
+  --coffee-soft: rgba(95, 92, 112, 0.2);
+  --taupe: rgba(255, 255, 255, 0.6);
+  --taupe-strong: rgba(225, 219, 232, 0.76);
+  --yellow: #d8bfdc;
+  --yellow-deep: #9c7ca6;
+  --aqua: #6f86b7;
+  --aqua-soft: #eef0f7;
+  --panel: rgba(255, 255, 255, 0.68);
+  --panel-strong: rgba(255, 255, 255, 0.9);
+  --rose: #b87892;
+  --ink: #27303f;
+  --shadow: rgba(58, 59, 82, 0.2);
+  --line: rgba(80, 82, 112, 0.28);
   font-family: "PingFang TC", "PingFang SC", "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
 }
 
@@ -34,7 +38,14 @@ body {
   min-width: 320px;
   min-height: 100vh;
   color: var(--ink);
-  background: var(--ivory);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(158, 137, 174, 0.2), transparent 28%),
+    radial-gradient(circle at 86% 18%, rgba(111, 134, 183, 0.18), transparent 26%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 235, 244, 0.84)),
+    repeating-linear-gradient(0deg, rgba(34, 48, 57, 0.035) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(34, 48, 57, 0.03) 0 1px, transparent 1px 28px),
+    var(--ivory);
+  background-attachment: fixed;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -60,16 +71,17 @@ a {
   text-decoration: none;
 }
 
-.doodle-layer {
+.background-layer {
   position: fixed;
   inset: 0;
   z-index: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.72;
+  opacity: 0.58;
   pointer-events: none;
-  mix-blend-mode: multiply;
+  filter: saturate(0.82) contrast(0.96);
+  mix-blend-mode: normal;
 }
 
 .app-shell {
@@ -80,10 +92,11 @@ a {
 }
 
 .sticker {
-  background: rgba(255, 253, 247, 0.94);
-  border: 2px solid var(--line);
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  box-shadow: 8px 8px 0 var(--shadow);
+  box-shadow: 0 18px 42px rgba(45, 70, 86, 0.12), 0 4px 0 rgba(111, 134, 183, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(22px) saturate(1.25);
 }
 
 .side-nav {
@@ -94,11 +107,12 @@ a {
   padding: 10px 8px;
   display: grid;
   gap: 10px;
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .side-nav button {
   min-height: 58px;
-  border: 1.5px solid transparent;
+  border: 1px solid transparent;
   border-radius: 8px;
   background: transparent;
   font-size: 13px;
@@ -108,14 +122,15 @@ a {
 
 .side-nav button:hover,
 .side-nav button.active {
-  background: var(--yellow);
-  border-color: var(--yellow-deep);
-  box-shadow: 4px 4px 0 rgba(157, 130, 101, 0.42);
+  background: linear-gradient(135deg, rgba(216, 191, 220, 0.92), rgba(111, 134, 183, 0.22));
+  border-color: rgba(111, 134, 183, 0.72);
+  box-shadow: 0 9px 22px rgba(111, 134, 183, 0.2);
 }
 
 .side-nav button.active {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0 var(--coffee-soft);
+  color: var(--coffee-deep);
+  transform: none;
+  box-shadow: inset 0 0 0 1px rgba(216, 191, 220, 0.95), 0 10px 24px rgba(111, 134, 183, 0.22);
 }
 
 .workspace {
@@ -153,6 +168,7 @@ a {
   line-height: 1.05;
   font-weight: 950;
   letter-spacing: 0;
+  text-shadow: 0 10px 28px rgba(111, 134, 183, 0.18);
 }
 
 .page-header h1 span {
@@ -165,20 +181,25 @@ a {
 .outline-link,
 .link-button {
   border: 1.5px solid var(--line);
-  border-radius: 7px;
-  background: var(--cream);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
   font-weight: 900;
   cursor: pointer;
+  backdrop-filter: blur(16px);
 }
 
 .outline-button {
   padding: 12px 16px;
-  box-shadow: 4px 4px 0 var(--coffee-soft);
+  box-shadow: 0 10px 22px rgba(111, 134, 183, 0.16);
 }
 
 .grid-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(390px, 1.08fr);
+  grid-template-areas:
+    "itinerary itinerary expense"
+    "packing shopping maps"
+    "food notes maps";
   gap: 20px;
   align-items: stretch;
   min-width: 0;
@@ -188,26 +209,45 @@ a {
   padding: 20px;
   min-height: 246px;
   min-width: 0;
+  position: relative;
+  overflow: hidden;
 }
 
 .card.is-focused {
-  outline: 3px solid var(--yellow-deep);
-  outline-offset: 4px;
-  box-shadow: 11px 11px 0 var(--yellow-deep), 16px 16px 0 var(--shadow);
-  transform: translate(-2px, -2px);
+  outline: 2px solid rgba(111, 134, 183, 0.9);
+  outline-offset: 3px;
+  box-shadow: 0 22px 48px rgba(111, 134, 183, 0.22), inset 0 0 0 1px rgba(216, 191, 220, 0.5);
+  transform: translateY(-1px);
 }
 
 .itinerary-card {
-  grid-column: span 2;
+  grid-area: itinerary;
   min-height: 430px;
 }
 
 .expense-card {
+  grid-area: expense;
   min-height: 430px;
 }
 
 .maps-card {
-  grid-column: span 1;
+  grid-area: maps;
+}
+
+[data-section-card="packing"] {
+  grid-area: packing;
+}
+
+[data-section-card="souvenir"] {
+  grid-area: shopping;
+}
+
+.food-card {
+  grid-area: food;
+}
+
+.notes-card {
+  grid-area: notes;
 }
 
 .card-title {
@@ -235,6 +275,7 @@ a {
 .ghost-button {
   padding: 8px 10px;
   color: var(--coffee-deep);
+  box-shadow: 0 7px 16px rgba(34, 48, 57, 0.06);
 }
 
 .date-tabs {
@@ -251,11 +292,12 @@ a {
 .date-tab {
   min-width: 132px;
   padding: 10px 12px;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 253, 247, 0.95);
+  background: rgba(255, 255, 255, 0.66);
   cursor: pointer;
-  box-shadow: 4px 4px 0 rgba(191, 162, 125, 0.45);
+  box-shadow: 0 8px 20px rgba(45, 70, 86, 0.08);
+  backdrop-filter: blur(14px);
 }
 
 .date-tab strong,
@@ -275,8 +317,9 @@ a {
 }
 
 .date-tab.active {
-  background: var(--yellow);
-  border-color: var(--yellow-deep);
+  background: linear-gradient(135deg, rgba(216, 191, 220, 0.96), rgba(238, 240, 247, 0.98));
+  border-color: rgba(111, 134, 183, 0.72);
+  box-shadow: 0 12px 24px rgba(111, 134, 183, 0.2);
 }
 
 .itinerary-body {
@@ -413,10 +456,12 @@ a {
 }
 
 .money-display {
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
   overflow: hidden;
   margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .money-display label {
@@ -441,7 +486,7 @@ a {
 }
 
 .money-display label:last-child strong {
-  color: #c96b28;
+  color: #9f647e;
 }
 
 .calc-grid {
@@ -453,10 +498,10 @@ a {
 .calc-grid button,
 .mini-keys button {
   min-height: 46px;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--cream);
-  box-shadow: 3px 3px 0 rgba(157, 130, 101, 0.45);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(232, 248, 251, 0.78));
+  box-shadow: 0 9px 18px rgba(45, 70, 86, 0.1);
   font-size: 24px;
   font-weight: 950;
   cursor: pointer;
@@ -464,10 +509,10 @@ a {
 
 .calc-grid button.equals,
 .primary {
-  border: 1.5px solid var(--yellow-deep);
+  border: 1px solid rgba(217, 173, 40, 0.62);
   border-radius: 8px;
-  background: var(--yellow);
-  box-shadow: 4px 4px 0 var(--shadow);
+  background: linear-gradient(135deg, var(--yellow), rgba(111, 134, 183, 0.22));
+  box-shadow: 0 12px 24px rgba(217, 173, 40, 0.18);
   color: var(--ink);
   font-weight: 950;
   cursor: pointer;
@@ -478,9 +523,124 @@ a {
   font-size: 17px;
 }
 
+.expense-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(120px, 0.7fr);
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 10px;
+  color: var(--coffee-deep);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.expense-tools label {
+  display: grid;
+  gap: 5px;
+}
+
+.expense-tools select,
+.currency-toggle button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink);
+  font-weight: 950;
+}
+
+.expense-tools select {
+  min-height: 34px;
+  padding: 6px 8px;
+}
+
+.currency-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.currency-toggle button {
+  min-height: 34px;
+  cursor: pointer;
+}
+
+.currency-toggle button.active,
+.route-mode button.active {
+  background: var(--aqua-soft);
+  border-color: rgba(111, 134, 183, 0.72);
+  box-shadow: 0 8px 18px rgba(111, 134, 183, 0.18), inset 0 0 0 1px rgba(216, 191, 220, 0.5);
+}
+
+.expense-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(111, 134, 183, 0.36);
+  border-radius: 8px;
+  background: rgba(232, 248, 251, 0.66);
+  box-shadow: 0 8px 18px rgba(111, 134, 183, 0.12);
+  margin-bottom: 10px;
+  font-weight: 950;
+}
+
+.expense-total span {
+  color: var(--coffee);
+  font-size: 12px;
+}
+
+.expense-total strong {
+  font-size: 22px;
+}
+
 .check-list {
   display: grid;
   gap: 8px;
+}
+
+.notes-list {
+  display: grid;
+  gap: 9px;
+  max-height: 310px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.note-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(82, 111, 128, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.54);
+}
+
+.note-copy {
+  min-width: 0;
+}
+
+.note-copy strong,
+.note-copy p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-copy strong {
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.note-copy p {
+  margin: 3px 0 0;
+  color: var(--coffee);
+  font-size: 12px;
+  font-weight: 850;
 }
 
 .check-row {
@@ -501,6 +661,11 @@ a {
   cursor: pointer;
 }
 
+.check-row.has-image {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
 .check-row span {
   overflow-wrap: anywhere;
 }
@@ -509,6 +674,16 @@ a {
   width: 17px;
   height: 17px;
   accent-color: var(--coffee);
+}
+
+.item-thumb {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 8px 18px rgba(45, 70, 86, 0.12);
 }
 
 .row-actions {
@@ -521,9 +696,9 @@ a {
 
 .row-actions button {
   min-height: 28px;
-  border: 1.5px solid var(--line);
-  border-radius: 7px;
-  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.68);
   color: var(--coffee-deep);
   font-size: 12px;
   font-weight: 950;
@@ -538,9 +713,9 @@ a {
 
 .place-list,
 .route-panel {
-  border: 1.5px solid var(--coffee-soft);
+  border: 1px solid var(--coffee-soft);
   border-radius: 8px;
-  background: rgba(255, 250, 240, 0.7);
+  background: rgba(255, 255, 255, 0.5);
   padding: 11px;
 }
 
@@ -565,8 +740,8 @@ a {
 .place-row em,
 .ledger-row em {
   padding: 3px 8px;
-  border-radius: 6px;
-  background: var(--taupe);
+  border-radius: 999px;
+  background: rgba(232, 248, 251, 0.86);
   color: var(--coffee-deep);
   font-size: 12px;
   font-style: normal;
@@ -589,6 +764,31 @@ a {
   align-content: start;
 }
 
+.route-mode {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.route-mode button {
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.route-hint {
+  margin: 0;
+  color: var(--coffee);
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
 .route-panel h3 {
   margin: 0;
   font-size: 20px;
@@ -605,17 +805,19 @@ a {
 
 .route-panel select,
 .modal input,
-.modal textarea {
+.modal textarea,
+.modal select {
   width: 100%;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--cream);
+  background: rgba(255, 255, 255, 0.72);
   color: var(--ink);
   font-weight: 850;
 }
 
 .route-panel select,
-.modal input {
+.modal input,
+.modal select {
   min-height: 38px;
   padding: 7px 9px;
 }
@@ -667,10 +869,11 @@ a {
   bottom: 142px;
   width: 88px;
   height: 88px;
-  border: 2px solid var(--line);
+  border: 1px solid rgba(111, 134, 183, 0.44);
   border-radius: 50%;
-  background: var(--taupe);
-  box-shadow: 8px 8px 0 var(--shadow);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 18px 36px rgba(111, 134, 183, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(18px);
   font-size: 18px;
   font-weight: 950;
 }
@@ -680,8 +883,8 @@ a {
   bottom: 24px;
   width: min(680px, calc(100vw - 48px));
   height: 62px;
-  border: 2px solid var(--yellow-deep);
-  background: var(--yellow);
+  border: 1px solid rgba(217, 173, 40, 0.58);
+  background: linear-gradient(135deg, rgba(216, 191, 220, 0.96), rgba(255, 255, 255, 0.72));
   transform: translateX(-50%);
   font-size: 28px;
   font-weight: 950;
@@ -694,7 +897,8 @@ a {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(90, 70, 56, 0.2);
+  background: rgba(34, 48, 57, 0.22);
+  backdrop-filter: blur(8px);
 }
 
 .modal {
@@ -746,9 +950,9 @@ a {
 .form-check {
   width: 100%;
   min-height: 44px;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--cream);
+  background: rgba(255, 255, 255, 0.72);
   color: var(--ink);
   font-weight: 850;
 }
@@ -773,6 +977,32 @@ a {
   accent-color: var(--coffee);
 }
 
+.file-field input {
+  padding: 8px;
+}
+
+.image-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  padding: 10px;
+  border: 1px dashed rgba(111, 134, 183, 0.56);
+  border-radius: 8px;
+  background: rgba(232, 248, 251, 0.58);
+  margin-bottom: 10px;
+}
+
+.image-preview .item-thumb {
+  width: 58px;
+  height: 58px;
+}
+
+.image-remove {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
 .modal-actions {
   display: grid;
   grid-template-columns: 0.8fr 1.2fr;
@@ -781,11 +1011,11 @@ a {
 
 .danger {
   min-height: 46px;
-  border: 1.5px solid var(--rose);
+  border: 1px solid rgba(212, 108, 95, 0.48);
   border-radius: 8px;
-  background: #fff3ee;
+  background: rgba(255, 243, 238, 0.82);
   color: #8d4538;
-  box-shadow: 4px 4px 0 var(--coffee-soft);
+  box-shadow: 0 10px 20px rgba(212, 108, 95, 0.12);
   font-weight: 950;
   cursor: pointer;
 }
@@ -794,9 +1024,9 @@ a {
   position: absolute;
   top: 12px;
   right: 12px;
-  border: 1.5px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: var(--cream);
+  background: rgba(255, 255, 255, 0.76);
   padding: 7px 10px;
   font-size: 12px;
   font-weight: 900;
@@ -854,7 +1084,7 @@ a {
 }
 
 .mini-result strong {
-  color: #c96b28;
+  color: #9f647e;
   font-size: 34px;
   font-weight: 950;
 }
@@ -886,7 +1116,7 @@ a {
   .side-nav {
     position: static;
     width: 100%;
-    grid-template-columns: repeat(7, minmax(70px, 1fr));
+    grid-template-columns: repeat(9, minmax(70px, 1fr));
     margin-bottom: 18px;
     overflow-x: auto;
   }
@@ -897,8 +1127,20 @@ a {
 
   .grid-board {
     grid-template-columns: 1fr 1fr;
+    grid-template-areas: none;
   }
 
+  .itinerary-card,
+  .expense-card,
+  [data-section-card="packing"],
+  [data-section-card="souvenir"],
+  .food-card,
+  .notes-card,
+  .maps-card {
+    grid-area: auto;
+  }
+
+  .itinerary-card,
   .expense-card,
   .maps-card {
     grid-column: span 2;
@@ -989,7 +1231,7 @@ a {
     padding: 10px 10px 196px;
   }
 
-  .doodle-layer {
+  .background-layer {
     opacity: 0.5;
   }
 
@@ -1022,7 +1264,7 @@ a {
   .header-actions {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 
@@ -1210,46 +1452,96 @@ a {
   }
 
   .money-display label {
-    min-height: 42px;
-    padding: 6px 9px;
-    font-size: 12px;
+    min-height: 30px;
+    padding: 4px 7px;
+    font-size: 10px;
+    white-space: nowrap;
   }
 
   .money-display strong {
-    font-size: 20px;
+    font-size: 14px;
   }
 
   .rate-line,
   .list-head {
-    align-items: start;
+    align-items: center;
     gap: 4px;
     font-size: 11px;
   }
 
   .rate-line {
-    flex-direction: column;
-    margin-bottom: 7px;
+    flex-direction: row;
+    margin-bottom: 0;
+    white-space: nowrap;
   }
 
   .rate-line small {
-    font-size: 10px;
+    display: none;
   }
 
   .expense-card {
     display: grid;
-    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-    column-gap: 10px;
+    grid-template-columns: minmax(112px, 0.78fr) minmax(156px, 1.22fr);
+    column-gap: 8px;
+    row-gap: 6px;
     align-items: start;
-    min-height: 244px;
+    min-height: 278px;
   }
 
   .expense-card .card-title {
     grid-column: 1 / -1;
+    margin-bottom: 2px;
   }
 
   .expense-card .rate-line,
+  .expense-card .expense-tools,
+  .expense-card .expense-total,
   .expense-card .money-display {
     grid-column: 1;
+  }
+
+  .expense-card .expense-tools {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    margin-bottom: 0;
+    font-size: 9.5px;
+  }
+
+  .expense-card .expense-tools > div > span,
+  .expense-card .expense-tools label {
+    white-space: nowrap;
+  }
+
+  .expense-card .expense-tools select {
+    min-height: 28px;
+    padding: 4px 6px;
+    font-size: 10px;
+  }
+
+  .expense-card .currency-toggle {
+    gap: 4px;
+    margin-top: 3px;
+  }
+
+  .expense-card .currency-toggle button {
+    min-height: 26px;
+    padding: 0 4px;
+    font-size: 10px;
+  }
+
+  .expense-card .expense-total {
+    padding: 6px 7px;
+    margin-bottom: 0;
+    gap: 4px;
+    white-space: nowrap;
+  }
+
+  .expense-card .expense-total span {
+    font-size: 9.5px;
+  }
+
+  .expense-card .expense-total strong {
+    font-size: 14px;
   }
 
   .expense-card .money-display {
@@ -1258,22 +1550,25 @@ a {
 
   .expense-card .calc-grid {
     grid-column: 2;
-    grid-row: 2 / span 2;
+    grid-row: 2 / 6;
     align-self: stretch;
   }
 
   .calc-grid {
     gap: 5px;
+    grid-template-rows: repeat(4, minmax(0, 1fr));
   }
 
   .calc-grid button {
-    min-height: 37px;
-    font-size: 16px;
-    box-shadow: 2px 2px 0 rgba(157, 130, 101, 0.45);
+    min-height: 32px;
+    padding: 0;
+    font-size: 14px;
+    box-shadow: 0 8px 16px rgba(45, 70, 86, 0.09);
   }
 
   .check-list,
-  .place-list {
+  .place-list,
+  .notes-list {
     max-height: 320px;
     overflow-y: auto;
   }
@@ -1286,10 +1581,21 @@ a {
   }
 
   .check-row .row-actions,
+  .note-row .row-actions,
   .place-row .row-actions,
   .ledger-row .row-actions,
   .stop-copy .row-actions {
     justify-content: flex-start;
+  }
+
+  .note-row {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .note-row .row-actions {
+    grid-column: 1 / -1;
   }
 
   .place-list,
@@ -1440,7 +1746,7 @@ a {
 </style>
   </head>
   <body>
-    <img class="doodle-layer" src="./assets/doodles.png" alt="" aria-hidden="true" />
+    <img class="background-layer" src="./assets/travel-tech-bg.png" alt="" aria-hidden="true" />
     <div id="app"></div>
     <script>const defaultExchangeRate = 0.19678;
 const defaultRateMeta = {
@@ -1630,7 +1936,7 @@ const packingItems = [
   ["skincare", "盥洗用品 / 保養品", false],
 ];
 
-const souvenirItems = [
+const shoppingItems = [
   ["shiroi", "白色戀人", true],
   ["royce", "ROYCE' 巧克力", true],
   ["snacks", "薯條三兄弟", true],
@@ -1639,6 +1945,17 @@ const souvenirItems = [
   ["limited", "大阪限定 零食", false],
   ["other", "其他：__________", false],
 ];
+
+const foodItems = [
+  ["takoyaki", "道頓堀章魚燒", true],
+  ["okonomi", "大阪燒", false],
+  ["harbs", "HARBS 蛋糕", true],
+  ["ramen", "一蘭 / 金龍拉麵", false],
+  ["kushi", "新世界串炸", false],
+  ["matcha-dessert", "京都抹茶甜點", false],
+];
+
+const storageKey = "osakaKyotoTravelPlannerV4";
 
 let state = {
   tripTitle: "大阪・京都",
@@ -1651,18 +1968,25 @@ let state = {
   places: [...initialPlaces],
   itinerary: {},
   yenInput: "12800",
+  expenseCurrency: "JPY",
+  displayCurrency: "TWD",
+  routeMode: "auto",
   ledger: [
-    { id: "e1", title: "HARBS 蛋糕", yen: 1980, twd: 390, day: "D1" },
-    { id: "e2", title: "交通加值", yen: 3000, twd: 590, day: "D2" },
+    { id: "e1", title: "HARBS 蛋糕", amount: 1980, currency: "JPY", yen: 1980, twd: 390, day: "D1" },
+    { id: "e2", title: "交通加值", amount: 3000, currency: "JPY", yen: 3000, twd: 590, day: "D2" },
   ],
   packing: packingItems.map(([id, label, done]) => ({ id, label, done })),
-  souvenirs: souvenirItems.map(([id, label, done]) => ({ id, label, done })),
+  souvenirs: shoppingItems.map(([id, label, done]) => ({ id, label, done, image: "" })),
+  foods: foodItems.map(([id, label, done]) => ({ id, label, done })),
+  notes: [],
   modal: null,
   drawerOpen: false,
   importText: "",
   addKind: "spot",
   addName: "",
   addDetail: "",
+  addCurrency: "JPY",
+  addImage: "",
   editing: null,
   editDraft: {},
 };
@@ -1736,6 +2060,7 @@ function buildAutoItinerary(places) {
 }
 
 state.itinerary = buildAutoItinerary(state.places);
+loadSavedState();
 
 function getCurrentDay() {
   return state.days.find((day) => day.id === state.activeDay);
@@ -1748,6 +2073,97 @@ function getCurrentStops() {
 function twdFromYen(value) {
   const yen = Number(value || 0);
   return Math.round(yen * state.exchangeRate);
+}
+
+function yenFromTwd(value) {
+  const twd = Number(value || 0);
+  return Math.round(twd / state.exchangeRate);
+}
+
+function normalizeExpense(entry) {
+  const currency = entry.currency === "TWD" ? "TWD" : "JPY";
+  const amount = Number(entry.amount ?? (currency === "TWD" ? entry.twd : entry.yen) ?? 0);
+  const yen = currency === "JPY" ? amount : yenFromTwd(amount);
+  const twd = currency === "TWD" ? amount : twdFromYen(amount);
+
+  return {
+    ...entry,
+    amount,
+    currency,
+    yen: Math.round(Number(entry.yen ?? yen)),
+    twd: Math.round(Number(entry.twd ?? twd)),
+  };
+}
+
+function formatMoney(value, currency) {
+  const symbol = currency === "TWD" ? "NT$" : "¥";
+  return `${symbol}${Math.round(Number(value || 0)).toLocaleString()}`;
+}
+
+function totalExpense(currency = state.displayCurrency) {
+  const totalTwd = state.ledger.reduce((sum, entry) => sum + normalizeExpense(entry).twd, 0);
+  return currency === "TWD" ? totalTwd : yenFromTwd(totalTwd);
+}
+
+function saveState() {
+  try {
+    const snapshot = {
+      tripTitle: state.tripTitle,
+      tripDates: state.tripDates,
+      exchangeRate: state.exchangeRate,
+      rateMeta: state.rateMeta,
+      days: state.days,
+      activeDay: state.activeDay,
+      activeSection: state.activeSection,
+      places: state.places,
+      itinerary: state.itinerary,
+      yenInput: state.yenInput,
+      expenseCurrency: state.expenseCurrency,
+      displayCurrency: state.displayCurrency,
+      routeMode: state.routeMode,
+      ledger: state.ledger.map(normalizeExpense),
+      packing: state.packing,
+      souvenirs: state.souvenirs,
+      foods: state.foods,
+      notes: state.notes,
+    };
+    localStorage.setItem(storageKey, JSON.stringify(snapshot));
+  } catch {
+    // Local storage can be unavailable in private browsing; the app still works in memory.
+  }
+}
+
+function loadSavedState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+    if (!saved) return;
+    const merged = { ...state, ...saved };
+    const previousState = state;
+    state = { ...state, exchangeRate: merged.exchangeRate };
+    const ledger = (saved.ledger || previousState.ledger).map(normalizeExpense);
+    state = previousState;
+
+    state = {
+      ...merged,
+      modal: null,
+      drawerOpen: false,
+      importText: "",
+      addKind: "spot",
+      addName: "",
+      addDetail: "",
+      addCurrency: "JPY",
+      addImage: "",
+      editing: null,
+      editDraft: {},
+      ledger,
+      souvenirs: (saved.souvenirs || state.souvenirs).map((item) => ({ image: "", ...item })),
+      foods: saved.foods || state.foods,
+      notes: (saved.notes || state.notes).map((item) => ({ title: "", body: "", image: "", ...item })),
+      itinerary: saved.itinerary || buildAutoItinerary(saved.places || merged.places),
+    };
+  } catch {
+    state.itinerary = buildAutoItinerary(state.places);
+  }
 }
 
 function formatRate(value = state.exchangeRate) {
@@ -1769,7 +2185,7 @@ function mapsUrl(stops = getCurrentStops()) {
   }&travelmode=walking`;
 }
 
-const scrollSelectors = [".date-tabs", ".timeline", ".check-list", ".place-list", ".ledger-list", ".modal"];
+const scrollSelectors = [".date-tabs", ".timeline", ".check-list", ".place-list", ".notes-list", ".ledger-list", ".modal"];
 
 function captureScrollState() {
   return {
@@ -1821,6 +2237,7 @@ function setState(patch, options = {}) {
   const previousState = state;
   const scrollSnapshot = options.preserveScroll === false ? null : captureScrollState();
   state = { ...state, ...patch };
+  saveState();
   render();
 
   const shouldSyncDateTabs = patch.activeDay && patch.activeDay !== previousState.activeDay;
@@ -1882,7 +2299,7 @@ function openEdit(type, id, kind = "") {
   if (type === "expense") {
     const entry = state.ledger.find((item) => item.id === id);
     if (!entry) return;
-    setState({ modal: "edit", editing: { type, id }, editDraft: { ...entry } });
+    setState({ modal: "edit", editing: { type, id }, editDraft: { ...normalizeExpense(entry) } });
     return;
   }
 
@@ -1890,6 +2307,13 @@ function openEdit(type, id, kind = "") {
     const item = state[kind]?.find((row) => row.id === id);
     if (!item) return;
     setState({ modal: "edit", editing: { type, id, kind }, editDraft: { ...item } });
+    return;
+  }
+
+  if (type === "note") {
+    const note = state.notes.find((item) => item.id === id);
+    if (!note) return;
+    setState({ modal: "edit", editing: { type, id }, editDraft: { ...note } });
     return;
   }
 
@@ -1914,6 +2338,11 @@ function deleteItem(type, id, kind = "") {
 
   if (type === "check") {
     setState({ [kind]: state[kind].filter((item) => item.id !== id), modal: null });
+    return;
+  }
+
+  if (type === "note") {
+    setState({ notes: state.notes.filter((item) => item.id !== id), modal: null });
   }
 }
 
@@ -1973,13 +2402,17 @@ function saveEdit() {
   }
 
   if (editing.type === "expense") {
+    const amount = Number(draft.amount ?? draft.yen) || 0;
+    const currency = draft.currency === "TWD" ? "TWD" : "JPY";
     const ledger = state.ledger.map((entry) =>
       entry.id === editing.id
         ? {
             ...entry,
             title: draft.title?.trim() || entry.title,
-            yen: Number(draft.yen) || entry.yen,
-            twd: twdFromYen(Number(draft.yen) || entry.yen),
+            amount: amount || entry.amount || entry.yen,
+            currency,
+            yen: currency === "JPY" ? amount || entry.yen : yenFromTwd(amount || entry.twd),
+            twd: currency === "TWD" ? amount || entry.twd : twdFromYen(amount || entry.yen),
             day: draft.day?.trim() || entry.day,
           }
         : entry,
@@ -1996,10 +2429,26 @@ function saveEdit() {
             ...item,
             label: draft.label?.trim() || item.label,
             done: Boolean(draft.done),
+            image: draft.image ?? item.image ?? "",
           }
         : item,
     );
     setState({ [kind]: rows, modal: null, editing: null, editDraft: {} });
+    return;
+  }
+
+  if (editing.type === "note") {
+    const notes = state.notes.map((note) =>
+      note.id === editing.id
+        ? {
+            ...note,
+            title: draft.title?.trim() || "",
+            body: draft.body ?? "",
+            image: draft.image ?? "",
+          }
+        : note,
+    );
+    setState({ notes, modal: null, editing: null, editDraft: {} });
   }
 }
 
@@ -2013,13 +2462,15 @@ function handleCalc(key) {
     return;
   }
   if (key === "=") {
-    const yen = Number(state.yenInput || 0);
-    if (!yen) return;
+    const amount = Number(state.yenInput || 0);
+    if (!amount) return;
     const entry = {
       id: `e${Date.now()}`,
       title: `${getCurrentDay().label} 消費`,
-      yen,
-      twd: twdFromYen(yen),
+      amount,
+      currency: state.expenseCurrency,
+      yen: state.expenseCurrency === "JPY" ? amount : yenFromTwd(amount),
+      twd: state.expenseCurrency === "TWD" ? amount : twdFromYen(amount),
       day: getCurrentDay().label.split(" ")[0],
     };
     setState({ ledger: [entry, ...state.ledger], modal: "ledger" });
@@ -2036,15 +2487,37 @@ function toggleChecklist(kind, id) {
   setState({ [kind]: items });
 }
 
+function mapsNameFromLine(line, index) {
+  const urlMatch = line.match(/https?:\/\/\S+/);
+  if (!urlMatch) return "";
+
+  try {
+    const url = new URL(urlMatch[0]);
+    const queryName = url.searchParams.get("q") || url.searchParams.get("query");
+    if (queryName) return decodeURIComponent(queryName).replace(/\+/g, " ");
+
+    const placeIndex = url.pathname.split("/").findIndex((part) => part === "place");
+    const placeName = url.pathname.split("/")[placeIndex + 1];
+    if (placeName) return decodeURIComponent(placeName).replace(/\+/g, " ");
+  } catch {
+    return `Google Maps 景點 ${index + 1}`;
+  }
+
+  return `Google Maps 景點 ${index + 1}`;
+}
+
 function parseImport(text) {
   return text
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line, index) => {
-      const [name, cityRaw, areaRaw, stayRaw] = line.split(",").map((part) => part?.trim());
+      const normalizedLine = line.replaceAll("\t", ",").replaceAll("｜", ",").replaceAll("|", ",");
+      const [rawName, cityRaw, areaRaw, stayRaw] = normalizedLine.split(",").map((part) => part?.trim());
+      const name = rawName && !/^https?:\/\//.test(rawName) ? rawName : mapsNameFromLine(line, index);
       const cityText = cityRaw || "";
-      const city = /京都|kyoto/i.test(cityText) ? "京都" : "大阪";
+      const combinedText = `${line} ${cityText}`;
+      const city = /京都|kyoto|清水|祇園|伏見|嵐山|錦市場/i.test(combinedText) ? "京都" : "大阪";
       const base = city === "京都" ? { lat: 35.0116, lng: 135.7681 } : { lat: 34.6937, lng: 135.5023 };
       return {
         id: `i${Date.now()}${index}`,
@@ -2069,6 +2542,7 @@ function importPlaces() {
     importText: "",
     modal: null,
     activeSection: "maps",
+    routeMode: "auto",
   });
 }
 
@@ -2076,12 +2550,47 @@ function autoArrange() {
   setState({
     itinerary: buildAutoItinerary(state.places),
     activeSection: "itinerary",
+    routeMode: "auto",
     modal: "routeResult",
+  });
+}
+
+function moveStop(id, direction) {
+  const stops = [...getCurrentStops()];
+  const index = stops.findIndex((stop) => stop.id === id);
+  const nextIndex = direction === "up" ? index - 1 : index + 1;
+  if (index < 0 || nextIndex < 0 || nextIndex >= stops.length) return;
+
+  const nextStops = stops.map((stop) => ({ ...stop }));
+  [nextStops[index], nextStops[nextIndex]] = [nextStops[nextIndex], nextStops[index]];
+  setState({
+    itinerary: { ...state.itinerary, [state.activeDay]: nextStops },
+    routeMode: "manual",
+    activeSection: "itinerary",
   });
 }
 
 function addItem() {
   const name = state.addName.trim();
+
+  if (state.addKind === "note") {
+    const note = {
+      id: `note${Date.now()}`,
+      title: name,
+      body: state.addDetail,
+      image: state.addImage || "",
+    };
+    setState({
+      notes: [note, ...state.notes],
+      addName: "",
+      addDetail: "",
+      addImage: "",
+      modal: null,
+      activeSection: "notes",
+    });
+    return;
+  }
+
   if (!name) return;
 
   if (state.addKind === "spot") {
@@ -2110,30 +2619,64 @@ function addItem() {
   }
 
   if (state.addKind === "expense") {
-    const yen = Number(state.addDetail) || Number(state.yenInput) || 0;
-    if (!yen) return;
+    const amount = Number(state.addDetail) || Number(state.yenInput) || 0;
+    if (!amount) return;
     const entry = {
       id: `e${Date.now()}`,
       title: name,
-      yen,
-      twd: twdFromYen(yen),
+      amount,
+      currency: state.addCurrency || state.expenseCurrency,
+      yen: (state.addCurrency || state.expenseCurrency) === "JPY" ? amount : yenFromTwd(amount),
+      twd: (state.addCurrency || state.expenseCurrency) === "TWD" ? amount : twdFromYen(amount),
       day: getCurrentDay().label.split(" ")[0],
     };
-    setState({ ledger: [entry, ...state.ledger], addName: "", addDetail: "", modal: null });
+    setState({ ledger: [entry, ...state.ledger], addName: "", addDetail: "", addImage: "", modal: null });
     return;
   }
 
-  const key = state.addKind === "packing" ? "packing" : "souvenirs";
+  const key =
+    state.addKind === "packing" ? "packing" : state.addKind === "food" ? "foods" : "souvenirs";
   setState({
-    [key]: [...state[key], { id: `c${Date.now()}`, label: name, done: false }],
+    [key]: [...state[key], { id: `c${Date.now()}`, label: name, done: false, image: state.addImage || "" }],
     addName: "",
     addDetail: "",
+    addImage: "",
     modal: null,
   });
 }
 
 function cardClass(section, extra = "") {
   return `card sticker ${extra} ${state.activeSection === section ? "is-focused" : ""}`;
+}
+
+function renderImagePreview(image, alt = "清單圖片") {
+  if (!image) return "";
+  return `<img class="item-thumb" src="${safe(image)}" alt="${safe(alt)}" />`;
+}
+
+function renderImageControls(target, image = "") {
+  return `
+    <label class="form-row image-field">圖片網址
+      <input ${target === "edit" ? 'data-edit-field="image"' : 'id="addImage"'} value="${safe(image)}" placeholder="可貼圖片網址，也可直接上傳" />
+    </label>
+    <label class="form-row file-field">上傳圖片
+      <input type="file" accept="image/*" data-image-target="${target}" />
+    </label>
+    ${image ? `<div class="image-preview">${renderImagePreview(image)}</div><button class="ghost-button image-remove" data-action="removeImage" data-target="${target}">移除圖片</button>` : ""}
+  `;
+}
+
+function renderCurrencyButtons(active, action, target = "") {
+  return `
+    <div class="currency-toggle" ${target ? `data-currency-target="${target}"` : ""}>
+      ${["JPY", "TWD"]
+        .map(
+          (currency) =>
+            `<button class="${active === currency ? "active" : ""}" data-action="${action}" data-currency="${currency}">${currency}</button>`,
+        )
+        .join("")}
+    </div>
+  `;
 }
 
 function renderDateTabs() {
@@ -2170,6 +2713,8 @@ function renderTimeline() {
               index ? ` · 前段車程約 ${stop.travel} 分` : ""
             }</p>
             <div class="row-actions">
+              <button data-action="moveStop" data-id="${stop.id}" data-direction="up">上</button>
+              <button data-action="moveStop" data-id="${stop.id}" data-direction="down">下</button>
               <button data-action="edit" data-type="place" data-id="${stop.id}">編</button>
               <button data-action="delete" data-type="place" data-id="${stop.id}">刪</button>
             </div>
@@ -2183,17 +2728,21 @@ function renderTimeline() {
 function renderLedger() {
   return state.ledger
     .map(
-      (entry) => `
+      (entry) => {
+        const normalized = normalizeExpense(entry);
+        const unified = state.displayCurrency === "TWD" ? normalized.twd : normalized.yen;
+        return `
         <div class="ledger-row">
-          <span>${safe(entry.title)}</span>
-          <strong>¥${entry.yen.toLocaleString()}</strong>
-          <em>NT$${entry.twd.toLocaleString()}</em>
+          <span>${safe(normalized.title)}</span>
+          <strong>${formatMoney(normalized.amount, normalized.currency)}</strong>
+          <em>${formatMoney(unified, state.displayCurrency)}</em>
           <div class="row-actions">
-            <button data-action="edit" data-type="expense" data-id="${entry.id}">編</button>
-            <button data-action="delete" data-type="expense" data-id="${entry.id}">刪</button>
+            <button data-action="edit" data-type="expense" data-id="${normalized.id}">編</button>
+            <button data-action="delete" data-type="expense" data-id="${normalized.id}">刪</button>
           </div>
         </div>
-      `,
+      `;
+      },
     )
     .join("");
 }
@@ -2202,14 +2751,39 @@ function renderChecklist(kind) {
   return state[kind]
     .map(
       (item) => `
-        <div class="check-row">
+        <div class="check-row ${item.image ? "has-image" : ""}">
           <label>
             <input type="checkbox" ${item.done ? "checked" : ""} data-action="toggle" data-kind="${kind}" data-id="${item.id}" />
+            ${renderImagePreview(item.image, item.label)}
             <span>${safe(item.label)}</span>
           </label>
           <div class="row-actions">
             <button data-action="edit" data-type="check" data-kind="${kind}" data-id="${item.id}">編</button>
             <button data-action="delete" data-type="check" data-kind="${kind}" data-id="${item.id}">刪</button>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+function renderNotes() {
+  if (!state.notes.length) {
+    return `<div class="empty-note">尚未新增備註，按下方「+ 新增」即可建立空白備註。</div>`;
+  }
+
+  return state.notes
+    .map(
+      (note) => `
+        <div class="note-row">
+          ${renderImagePreview(note.image, note.title || "備註圖片")}
+          <div class="note-copy">
+            <strong>${safe(note.title || "未命名備註")}</strong>
+            <p>${safe(note.body || "空白備註")}</p>
+          </div>
+          <div class="row-actions">
+            <button data-action="edit" data-type="note" data-id="${note.id}">編</button>
+            <button data-action="delete" data-type="note" data-id="${note.id}">刪</button>
           </div>
         </div>
       `,
@@ -2300,13 +2874,20 @@ function renderEditModal() {
   }
 
   if (editing.type === "expense") {
+    const currency = state.editDraft.currency || "JPY";
     return `
       <div class="modal-backdrop" data-action="closeModal">
         <section class="modal sticker" role="dialog" aria-modal="true">
           <button class="modal-close" data-action="closeModal">關閉</button>
           <h2>編輯記帳</h2>
           <label class="form-row">名稱<input data-edit-field="title" value="${fieldValue("title")}" /></label>
-          <label class="form-row">日幣<input data-edit-field="yen" inputmode="numeric" value="${fieldValue("yen")}" /></label>
+          <label class="form-row">幣別
+            <select data-edit-field="currency">
+              <option value="JPY" ${currency === "JPY" ? "selected" : ""}>日幣 JPY</option>
+              <option value="TWD" ${currency === "TWD" ? "selected" : ""}>台幣 TWD</option>
+            </select>
+          </label>
+          <label class="form-row">金額<input data-edit-field="amount" inputmode="numeric" value="${safe(state.editDraft.amount ?? state.editDraft.yen ?? "")}" /></label>
           <label class="form-row">日期<input data-edit-field="day" value="${fieldValue("day")}" /></label>
           <div class="modal-actions">
             <button class="danger" data-action="delete" data-type="expense" data-id="${editing.id}">刪除</button>
@@ -2325,8 +2906,27 @@ function renderEditModal() {
           <h2>編輯清單</h2>
           <label class="form-row">項目<input data-edit-field="label" value="${fieldValue("label")}" /></label>
           <label class="form-check"><input type="checkbox" data-edit-field="done" ${state.editDraft.done ? "checked" : ""} /> 已完成</label>
+          ${editing.kind === "souvenirs" ? renderImageControls("edit", state.editDraft.image || "") : ""}
           <div class="modal-actions">
             <button class="danger" data-action="delete" data-type="check" data-kind="${editing.kind}" data-id="${editing.id}">刪除</button>
+            <button class="primary" data-action="saveEdit">儲存修改</button>
+          </div>
+        </section>
+      </div>
+    `;
+  }
+
+  if (editing.type === "note") {
+    return `
+      <div class="modal-backdrop" data-action="closeModal">
+        <section class="modal sticker" role="dialog" aria-modal="true">
+          <button class="modal-close" data-action="closeModal">關閉</button>
+          <h2>編輯備註</h2>
+          <label class="form-row">標題<input data-edit-field="title" value="${fieldValue("title")}" placeholder="可留空" /></label>
+          <label class="form-row">內容<textarea data-edit-field="body" placeholder="自由填寫">${fieldValue("body")}</textarea></label>
+          ${renderImageControls("edit", state.editDraft.image || "")}
+          <div class="modal-actions">
+            <button class="danger" data-action="delete" data-type="note" data-id="${editing.id}">刪除</button>
             <button class="primary" data-action="saveEdit">儲存修改</button>
           </div>
         </section>
@@ -2348,8 +2948,8 @@ function renderModal() {
         <section class="modal sticker" role="dialog" aria-modal="true" aria-labelledby="import-title">
           <button class="modal-close" data-action="closeModal">關閉</button>
           <h2 id="import-title">匯入 Google Maps 收藏</h2>
-          <p>每行一個景點，可用：名稱, 城市, 區域, 停留分鐘。</p>
-          <textarea id="importText" placeholder="例：%0A大阪城天守閣, 大阪, 大阪城, 90%0A清水寺, 京都, 東山, 90">${state.importText}</textarea>
+          <p>貼上 Google Maps 儲存清單、分享連結或 CSV。每行一個景點，可用：名稱, 城市, 區域, 停留分鐘。</p>
+          <textarea id="importText" placeholder="例：%0A大阪城天守閣, 大阪, 大阪城, 90%0Ahttps://maps.google.com/?q=清水寺%0A伏見稻荷大社, 京都, 伏見, 100">${state.importText}</textarea>
           <button class="primary wide" data-action="importPlaces">匯入並重新排程</button>
         </section>
       </div>
@@ -2379,7 +2979,9 @@ function renderModal() {
               ["spot", "景點"],
               ["expense", "記帳"],
               ["packing", "行李"],
-              ["souvenir", "伴手禮"],
+              ["souvenir", "購物"],
+              ["food", "必吃"],
+              ["note", "備註"],
             ]
               .map(
                 ([id, label]) =>
@@ -2387,12 +2989,24 @@ function renderModal() {
               )
               .join("")}
           </div>
-          <input id="addName" value="${state.addName}" placeholder="${
-            state.addKind === "expense" ? "消費名稱" : state.addKind === "spot" ? "景點名稱" : "清單項目"
+          <input id="addName" value="${safe(state.addName)}" placeholder="${
+            state.addKind === "expense"
+              ? "消費名稱"
+              : state.addKind === "spot"
+                ? "景點名稱"
+                : state.addKind === "note"
+                  ? "備註標題（可空白）"
+                  : "清單項目"
           }" />
-          <input id="addDetail" value="${state.addDetail}" placeholder="${
-            state.addKind === "expense" ? "日幣金額" : state.addKind === "spot" ? "區域 / 備註" : "備註可留空"
-          }" />
+          ${state.addKind === "expense" ? renderCurrencyButtons(state.addCurrency || state.expenseCurrency, "setAddCurrency", "add") : ""}
+          ${
+            state.addKind === "note"
+              ? `<textarea id="addDetail" placeholder="自由填寫備註內容">${safe(state.addDetail)}</textarea>`
+              : `<input id="addDetail" value="${safe(state.addDetail)}" placeholder="${
+                  state.addKind === "expense" ? "金額" : state.addKind === "spot" ? "區域 / 備註" : "備註可留空"
+                }" />`
+          }
+          ${state.addKind === "souvenir" || state.addKind === "note" ? renderImageControls("add", state.addImage) : ""}
           <button class="primary wide" data-action="addItem">加入</button>
         </section>
       </div>
@@ -2438,11 +3052,31 @@ function renderDrawer() {
   `;
 }
 
+function readImageFile(file, target) {
+  if (!file.type.startsWith("image/")) return;
+
+  const reader = new FileReader();
+  reader.addEventListener("load", () => {
+    const image = String(reader.result || "");
+    if (target === "edit") {
+      setState({ editDraft: { ...state.editDraft, image } });
+    } else {
+      setState({ addImage: image });
+    }
+  });
+  reader.readAsDataURL(file);
+}
+
 function render() {
   const currentDay = getCurrentDay();
   const yen = Number(state.yenInput || 0);
+  const activeCurrency = state.expenseCurrency;
+  const convertedCurrency = activeCurrency === "JPY" ? "TWD" : "JPY";
+  const convertedValue = activeCurrency === "JPY" ? twdFromYen(yen) : yenFromTwd(yen);
   const completePacking = state.packing.filter((item) => item.done).length;
   const completeSouvenirs = state.souvenirs.filter((item) => item.done).length;
+  const completeFoods = state.foods.filter((item) => item.done).length;
+  const noteCount = state.notes.length;
 
   document.querySelector("#app").innerHTML = `
     <main class="app-shell ${state.modal ? "modal-active" : ""}">
@@ -2452,7 +3086,9 @@ function render() {
           ["itinerary", "行程表"],
           ["expense", "記帳本"],
           ["packing", "行李"],
-          ["souvenir", "伴手禮"],
+          ["souvenir", "購物清單"],
+          ["food", "必吃清單"],
+          ["notes", "備註"],
           ["maps", "地圖收藏"],
           ["settings", "設定"],
         ]
@@ -2471,7 +3107,6 @@ function render() {
           </div>
           <div class="header-actions">
             <button class="outline-button" data-action="openTripSettings">編輯旅程</button>
-            <button class="outline-button" data-action="autoArrange">重新排程</button>
           </div>
         </header>
 
@@ -2500,9 +3135,26 @@ function render() {
               <span>JPY -> TWD<small>${rateSourceText()}</small></span>
               <strong>匯率 ${formatRate()}</strong>
             </div>
+            <div class="expense-tools">
+              <div>
+                <span>輸入幣別</span>
+                ${renderCurrencyButtons(state.expenseCurrency, "setExpenseCurrency")}
+              </div>
+              <label>
+                統一顯示
+                <select data-action="displayCurrency">
+                  <option value="TWD" ${state.displayCurrency === "TWD" ? "selected" : ""}>台幣 TWD</option>
+                  <option value="JPY" ${state.displayCurrency === "JPY" ? "selected" : ""}>日幣 JPY</option>
+                </select>
+              </label>
+            </div>
+            <div class="expense-total">
+              <span>目前總支出</span>
+              <strong>${formatMoney(totalExpense(state.displayCurrency), state.displayCurrency)}</strong>
+            </div>
             <div class="money-display">
-              <label>JPY <strong>${yen.toLocaleString()}</strong></label>
-              <label>TWD <strong>${twdFromYen(yen).toLocaleString()}</strong></label>
+              <label>${activeCurrency} <strong>${yen.toLocaleString()}</strong></label>
+              <label>${convertedCurrency} <strong>${convertedValue.toLocaleString()}</strong></label>
             </div>
             <div class="calc-grid">
               ${["7", "8", "9", "back", "4", "5", "6", "+", "1", "2", "3", "-", "0", "00", ".", "="]
@@ -2524,10 +3176,26 @@ function render() {
 
           <article class="${cardClass("souvenir", "check-card")}" data-section-card="souvenir">
             <div class="card-title">
-              <h2>伴手禮</h2>
+              <h2>購物清單</h2>
               <span>${completeSouvenirs}/${state.souvenirs.length}</span>
             </div>
             <div class="check-list">${renderChecklist("souvenirs")}</div>
+          </article>
+
+          <article class="${cardClass("food", "check-card food-card")}" data-section-card="food">
+            <div class="card-title">
+              <h2>必吃清單</h2>
+              <span>${completeFoods}/${state.foods.length}</span>
+            </div>
+            <div class="check-list">${renderChecklist("foods")}</div>
+          </article>
+
+          <article class="${cardClass("notes", "check-card notes-card")}" data-section-card="notes">
+            <div class="card-title">
+              <h2>備註</h2>
+              <span>${noteCount}</span>
+            </div>
+            <div class="notes-list">${renderNotes()}</div>
           </article>
 
           <article class="${cardClass("maps", "maps-card")}" data-section-card="maps">
@@ -2545,6 +3213,10 @@ function render() {
               </div>
               <div class="route-panel">
                 <h3>順路排程</h3>
+                <div class="route-mode">
+                  <button class="${state.routeMode === "auto" ? "active" : ""}" data-action="autoArrange">自動排程</button>
+                  <button class="${state.routeMode === "manual" ? "active" : ""}" data-action="setRouteMode" data-mode="manual">手動調整</button>
+                </div>
                 <label>
                   選擇日期
                   <select data-action="selectDay">
@@ -2559,7 +3231,7 @@ function render() {
                 <div class="route-doodle">
                   <span></span><i></i><span></span>
                 </div>
-                <button class="primary" data-action="autoArrange">自動排程</button>
+                <p class="route-hint">${state.routeMode === "manual" ? "到行程表用每個景點旁的「上 / 下」調整順序。" : "匯入收藏後，會依城市與距離自動排順路。"}</p>
                 <a href="${mapsUrl()}" target="_blank" rel="noreferrer" class="outline-link">查看排程結果</a>
               </div>
             </div>
@@ -2592,6 +3264,10 @@ document.addEventListener("click", (event) => {
   if (action === "selectDay") return;
   if (action === "calc") handleCalc(target.dataset.key);
   if (action === "toggle") toggleChecklist(target.dataset.kind, target.dataset.id);
+  if (action === "setExpenseCurrency") setState({ expenseCurrency: target.dataset.currency });
+  if (action === "setAddCurrency") setState({ addCurrency: target.dataset.currency });
+  if (action === "setRouteMode") setState({ routeMode: target.dataset.mode, activeSection: "maps" });
+  if (action === "moveStop") moveStop(target.dataset.id, target.dataset.direction);
   if (action === "openImport") setState({ modal: "import", activeSection: "maps" });
   if (action === "importPlaces") importPlaces();
   if (action === "autoArrange") autoArrange();
@@ -2603,6 +3279,13 @@ document.addEventListener("click", (event) => {
   if (action === "edit") openEdit(target.dataset.type, target.dataset.id, target.dataset.kind);
   if (action === "delete") deleteItem(target.dataset.type, target.dataset.id, target.dataset.kind);
   if (action === "saveEdit") saveEdit();
+  if (action === "removeImage") {
+    if (target.dataset.target === "edit") {
+      setState({ editDraft: { ...state.editDraft, image: "" } });
+    } else {
+      setState({ addImage: "" });
+    }
+  }
   if (action === "toggleDrawer") setState({ drawerOpen: !state.drawerOpen });
   if (action === "closeModal" && event.target === target) setState({ modal: null });
 });
@@ -2610,6 +3293,12 @@ document.addEventListener("click", (event) => {
 document.addEventListener("change", (event) => {
   const select = event.target.closest("select[data-action='selectDay']");
   if (select) setState({ activeDay: select.value, activeSection: "maps" });
+
+  const displayCurrency = event.target.closest("select[data-action='displayCurrency']");
+  if (displayCurrency) setState({ displayCurrency: displayCurrency.value });
+
+  const imageInput = event.target.closest("input[type='file'][data-image-target]");
+  if (imageInput?.files?.[0]) readImageFile(imageInput.files[0], imageInput.dataset.imageTarget);
 
   const editField = event.target.closest("[data-edit-field]");
   if (editField) {
@@ -2622,6 +3311,7 @@ document.addEventListener("input", (event) => {
   if (event.target.id === "importText") state.importText = event.target.value;
   if (event.target.id === "addName") state.addName = event.target.value;
   if (event.target.id === "addDetail") state.addDetail = event.target.value;
+  if (event.target.id === "addImage") state.addImage = event.target.value;
   const editField = event.target.closest("[data-edit-field]");
   if (editField) {
     state.editDraft = { ...state.editDraft, [editField.dataset.editField]: editField.value };
