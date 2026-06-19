@@ -7,7 +7,7 @@
       name="description"
       content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
-    <meta name="travel-planner-version" content="20260619-edit-itinerary-time-v1" />
+    <meta name="travel-planner-version" content="20260619-google-list-places-v1" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -1979,6 +1979,59 @@ const initialPlaces = [
   },
 ];
 
+function savedPlace(id, name, area, tag, day, lat, lng, stay = 75, city = "大阪") {
+  return { id, name, city, area, lat, lng, stay, tag, day };
+}
+
+const googleSavedPlaces = [
+  savedPlace("g-nonkiya", "Nonkiya", "難波", "日本菜", "d4", 34.6672, 135.5011),
+  savedPlace("g-kizu-market", "木津市場", "木津市場", "市場", "d4", 34.6622, 135.4964, 90),
+  savedPlace("g-henrys-pizza", "Henry's PIZZA", "心齋橋", "披薩", "d4", 34.674, 135.5006),
+  savedPlace("g-akamaru-shokudo", "Akamaru Shokudo", "天王寺", "定食", "d4", 34.652, 135.513),
+  savedPlace("g-tsukito", "月盗", "難波", "居酒屋", "d4", 34.6681, 135.5022),
+  savedPlace("g-mugi-tori", "麥×鷄", "心齋橋", "拉麵", "d4", 34.675, 135.501),
+  savedPlace("g-hinode-namba", "Beef Hot Pot Hinode Osaka Namba Branch", "難波", "火鍋", "d4", 34.6667, 135.5015),
+  savedPlace("g-zagin", "雞湯拉麵 座銀", "心齋橋", "拉麵", "d4", 34.6742, 135.4978),
+  savedPlace("g-melt-chocolate", "Melt Chocolate", "心齋橋", "甜點", "d4", 34.6727, 135.5002),
+  savedPlace("g-shimanouchi-address", "2 Chome-13-10 Shimanouchi", "島之內", "地址", "d4", 34.6702, 135.5084, 45),
+  savedPlace("g-dekasan", "Dekasan", "難波", "三文治", "d4", 34.6678, 135.5012),
+  savedPlace("g-shateki", "Nihon’ichi Shateki Hihōkan", "新世界", "遊戲", "d4", 34.6527, 135.5062, 45),
+  savedPlace("g-mansen", "Horumon Yakiniku Mansen", "難波", "燒肉", "d4", 34.668, 135.5005),
+  savedPlace("g-chibo-dotonbori", "千房 道頓堀店", "道頓堀", "大阪燒", "d4", 34.6688, 135.5015),
+  savedPlace("g-creo-ru", "Creo-Ru Takoyaki & Okonomiyaki Dotonbori", "道頓堀", "章魚燒", "d4", 34.6685, 135.5013),
+  savedPlace("g-hana-noren", "Hana-Noren Tully’s Coffee - Namba Grand Kagetsu", "難波", "咖啡", "d4", 34.6658, 135.5032),
+  savedPlace("g-tsuruya", "Sukiyaki Syabu-Syabu Nihonbashi Tsuruya", "日本橋", "涮涮鍋", "d4", 34.6656, 135.5065),
+  savedPlace("g-mooken", "MooKEN", "難波", "點心", "d4", 34.6674, 135.5028),
+  savedPlace("g-gyutan-lemon", "牛たんの檸檬", "難波", "日本菜", "d4", 34.667, 135.502),
+  savedPlace("g-shinsaibashi-sand", "Shinsaibashi Sand", "心齋橋", "三文治", "d4", 34.6744, 135.5002),
+  savedPlace("g-wanaka-americamura", "章魚燒道樂わなか 美國村店", "美國村", "章魚燒", "d4", 34.6729, 135.4981),
+  savedPlace("g-craft-burger-kitahorie", "Craft Burger co. - Kitahorie", "北堀江", "漢堡", "d4", 34.6754, 135.494),
+  savedPlace("g-le-croissant", "Le Croissant Shinsaibashi", "心齋橋", "麵包", "d4", 34.6736, 135.5008),
+  savedPlace("g-okaru", "Okonomiyaki Okaru", "千日前", "大阪燒", "d4", 34.6663, 135.5024),
+  savedPlace("g-fishtons", "Ikareta Noodle Fishtons", "西大橋", "拉麵", "d4", 34.675, 135.4933),
+  savedPlace("g-gaten", "麵屋Gaten 難波心齋橋本店", "難波心齋橋", "拉麵", "d4", 34.6712, 135.501),
+  savedPlace("g-kyomachibori-nakamura", "Kyomachibori Nakamura", "京町堀", "炸豬排", "d1", 34.6868, 135.4932),
+  savedPlace("g-ice-dog", "元祖Ice Dog", "美國村", "冰淇淋", "d4", 34.6724, 135.4974),
+  savedPlace("g-grenier-umeda", "grenier 梅田店", "梅田", "西點", "d1", 34.7047, 135.4994),
+  savedPlace("g-hanadako", "Hanadako", "梅田", "章魚燒", "d1", 34.7029, 135.4973),
+  savedPlace("g-ozumi-hankyu", "Masahiko Ozumi Paris Hankyu Umeda Store", "梅田", "西點", "d1", 34.7036, 135.4988),
+  savedPlace("g-jiichiro-grand-front", "治一郎 GRAND FRONT大阪店", "梅田", "西點", "d1", 34.7055, 135.4948),
+  savedPlace("g-nakamuraya-croquette", "可樂餅 中村屋", "天神橋", "熟食", "d1", 34.7049, 135.512),
+  savedPlace("g-maeda-tofu", "Maeda Traditional Homemade Tofu Shop", "大阪", "豆腐", "d1", 34.695, 135.502),
+  savedPlace("g-niku-sangourmand", "Niku Sangourmand", "大阪", "餐廳", "d1", 34.697, 135.497),
+  savedPlace("g-yakiniku-hachi-umeda", "大阪燒肉 吃到飽 燒肉八 梅田茶屋町店", "梅田茶屋町", "燒肉", "d1", 34.7072, 135.4984),
+  savedPlace("g-la-barcaccia", "La Barcaccia", "中津", "義大利菜", "d1", 34.7102, 135.4925),
+  savedPlace("g-hirokazuya", "Hirokazuya Higashidori", "梅田東通", "大阪燒", "d1", 34.7034, 135.5015),
+  savedPlace("g-akagi-ramen", "Akagi Ramen", "梅田", "拉麵", "d1", 34.7039, 135.503),
+  savedPlace("g-kirimen", "Chuka Soba Kirimen Sohonten", "梅田", "拉麵", "d1", 34.704, 135.501),
+  savedPlace("g-mugito-mensuke", "麦と麺助 新梅田中津店", "中津", "拉麵", "d1", 34.7101, 135.4937),
+  savedPlace("g-kyomamean-fushimi", "京豆庵 京都伏見稲荷店", "伏見稻荷", "冰淇淋", "d2", 34.9686, 135.7718, 45, "京都"),
+  savedPlace("g-gokago", "GOKAGO", "京都", "咖啡", "d2", 35.0039, 135.778, 60, "京都"),
+  savedPlace("g-danno-horinji", "Dannō Hōrin-ji Temple", "京都", "寺廟", "d2", 35.012, 135.7716, 45, "京都"),
+];
+
+const defaultPlaces = [...initialPlaces, ...googleSavedPlaces];
+
 const packingItems = [
   ["passport", "護照 / 護照套", true],
   ["ticket", "機票 / 行程單", true],
@@ -2024,6 +2077,16 @@ function normalizeTripDay(day) {
   };
 }
 
+function mergePlaces(basePlaces, additions) {
+  const seen = new Set();
+  return [...basePlaces, ...additions].filter((place) => {
+    const key = place.name.trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 let state = {
   tripTitle: "大阪・京都",
   tripDates: "6/22-6/25",
@@ -2032,7 +2095,7 @@ let state = {
   days: initialDays.map((day) => normalizeTripDay({ ...day, seed: { ...day.seed } })),
   activeDay: "d1",
   activeSection: "home",
-  places: [...initialPlaces],
+  places: defaultPlaces.map((place) => ({ ...place })),
   itinerary: {},
   yenInput: "12800",
   expenseCurrency: "JPY",
@@ -2128,6 +2191,42 @@ function buildAutoItinerary(places) {
   return result;
 }
 
+function stopSortTime(stop) {
+  const match = String(stop.time || "").match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return 24 * 60;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function mergeItineraryWithPlaces(existingItinerary, places) {
+  if (!existingItinerary) return buildAutoItinerary(places);
+
+  const scheduledIds = new Set(
+    Object.values(existingItinerary)
+      .flat()
+      .map((stop) => stop.id),
+  );
+  const missingPlaces = places.filter((place) => !scheduledIds.has(place.id));
+  if (!missingPlaces.length) return existingItinerary;
+
+  const autoItinerary = buildAutoItinerary(places);
+  const merged = Object.fromEntries(
+    state.days.map((day) => [day.id, [...(existingItinerary[day.id] || [])]]),
+  );
+
+  missingPlaces.forEach((place) => {
+    const dayId = place.day || guessDay(place);
+    const autoStop = (autoItinerary[dayId] || []).find((stop) => stop.id === place.id) || {
+      ...place,
+      time: "09:00",
+      travel: 15,
+    };
+    merged[dayId].push(autoStop);
+    merged[dayId].sort((a, b) => stopSortTime(a) - stopSortTime(b));
+  });
+
+  return merged;
+}
+
 state.itinerary = buildAutoItinerary(state.places);
 loadSavedState();
 
@@ -2213,6 +2312,7 @@ function loadSavedState() {
     state = previousState;
 
     const normalizedDays = (saved.days || merged.days || state.days).map(normalizeTripDay);
+    const mergedPlaces = mergePlaces(saved.places || merged.places || state.places, googleSavedPlaces);
 
     state = {
       ...merged,
@@ -2229,11 +2329,12 @@ function loadSavedState() {
       addImage: "",
       editing: null,
       editDraft: {},
+      places: mergedPlaces,
       ledger,
       souvenirs: (saved.souvenirs || state.souvenirs).map((item) => ({ image: "", ...item })),
       foods: saved.foods || state.foods,
       notes: (saved.notes || state.notes).map((item) => ({ title: "", body: "", image: "", ...item })),
-      itinerary: saved.itinerary || buildAutoItinerary(saved.places || merged.places),
+      itinerary: mergeItineraryWithPlaces(saved.itinerary, mergedPlaces),
     };
   } catch {
     state.itinerary = buildAutoItinerary(state.places);
