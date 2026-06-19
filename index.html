@@ -7,7 +7,7 @@
       name="description"
       content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
-    <meta name="travel-planner-version" content="20260618-css-only-bg-v6" />
+    <meta name="travel-planner-version" content="20260619-edit-itinerary-time-v1" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -545,6 +545,11 @@ a {
   font-size: 17px;
 }
 
+.primary:disabled {
+  cursor: progress;
+  opacity: 0.64;
+}
+
 .expense-tools {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(120px, 0.7fr);
@@ -952,6 +957,39 @@ a {
   padding: 12px;
   resize: vertical;
   margin-bottom: 14px;
+}
+
+.import-helper,
+.import-status {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 14px;
+  padding: 12px;
+  border: 1px solid rgba(111, 134, 183, 0.32);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.54);
+  color: var(--coffee);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.import-helper strong,
+.import-status {
+  color: var(--coffee-deep);
+  font-weight: 950;
+}
+
+.import-helper a {
+  width: fit-content;
+  color: var(--aqua);
+  font-weight: 950;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.import-status {
+  border-color: rgba(184, 120, 146, 0.38);
+  background: rgba(255, 255, 255, 0.68);
 }
 
 .modal input {
@@ -2011,6 +2049,8 @@ let state = {
   modal: null,
   drawerOpen: false,
   importText: "",
+  importStatus: "",
+  importBusy: false,
   addKind: "spot",
   addName: "",
   addDetail: "",
@@ -2180,6 +2220,8 @@ function loadSavedState() {
       modal: null,
       drawerOpen: false,
       importText: "",
+      importStatus: "",
+      importBusy: false,
       addKind: "spot",
       addName: "",
       addDetail: "",
@@ -2308,6 +2350,56 @@ function fieldValue(key) {
   return safe(state.editDraft[key] ?? "");
 }
 
+function minutesFromTime(value) {
+  const match = String(value || "").match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return 24 * 60;
+  return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function normalizeTimeInput(value, fallback = "09:00") {
+  const text = String(value || "").trim();
+  const match = text.match(/^(\d{1,2})(?::?(\d{2}))?$/);
+  if (!match) return fallback;
+
+  const hours = Number(match[1]);
+  const minutes = Number(match[2] || 0);
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return fallback;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+function findItineraryStop(id) {
+  for (const [dayId, stops] of Object.entries(state.itinerary)) {
+    const stop = stops.find((item) => item.id === id);
+    if (stop) return { dayId, stop };
+  }
+
+  return null;
+}
+
+function updateManualItineraryStop(updatedPlace, time) {
+  const existing = findItineraryStop(updatedPlace.id);
+  const nextDayId = updatedPlace.day || existing?.dayId || state.activeDay;
+  const nextItinerary = Object.fromEntries(
+    state.days.map((day) => [
+      day.id,
+      (state.itinerary[day.id] || []).filter((stop) => stop.id !== updatedPlace.id),
+    ]),
+  );
+
+  const nextStop = {
+    ...(existing?.stop || {}),
+    ...updatedPlace,
+    time: normalizeTimeInput(time, existing?.stop?.time || "09:00"),
+    travel: existing?.stop?.travel || 15,
+  };
+
+  nextItinerary[nextDayId] = [...(nextItinerary[nextDayId] || []), nextStop].sort(
+    (a, b) => minutesFromTime(a.time) - minutesFromTime(b.time),
+  );
+
+  return { itinerary: nextItinerary, activeDay: nextDayId };
+}
+
 function openTripSettings() {
   setState({
     modal: "edit",
@@ -2324,7 +2416,16 @@ function openEdit(type, id, kind = "") {
   if (type === "place") {
     const place = state.places.find((item) => item.id === id);
     if (!place) return;
-    setState({ modal: "edit", editing: { type, id }, editDraft: { ...place } });
+    const scheduled = findItineraryStop(id);
+    setState({
+      modal: "edit",
+      editing: { type, id },
+      editDraft: {
+        ...place,
+        day: place.day || scheduled?.dayId || state.activeDay,
+        time: scheduled?.stop?.time || "09:00",
+      },
+    });
     return;
   }
 
@@ -2416,20 +2517,31 @@ function saveEdit() {
   }
 
   if (editing.type === "place") {
+    const original = state.places.find((place) => place.id === editing.id);
+    if (!original) return;
+    const updatedPlace = {
+      ...original,
+      name: draft.name?.trim() || original.name,
+      city: draft.city?.trim() || original.city,
+      area: draft.area?.trim() || original.area,
+      tag: draft.tag?.trim() || original.tag,
+      day: draft.day || original.day,
+      stay: Number(draft.stay) || original.stay,
+    };
     const places = state.places.map((place) =>
-      place.id === editing.id
-        ? {
-            ...place,
-            name: draft.name?.trim() || place.name,
-            city: draft.city?.trim() || place.city,
-            area: draft.area?.trim() || place.area,
-            tag: draft.tag?.trim() || place.tag,
-            day: draft.day || place.day,
-            stay: Number(draft.stay) || place.stay,
-          }
-        : place,
+      place.id === editing.id ? updatedPlace : place,
     );
-    setState({ places, itinerary: buildAutoItinerary(places), modal: null, editing: null, editDraft: {} });
+    const manualSchedule = updateManualItineraryStop(updatedPlace, draft.time);
+    setState({
+      places,
+      itinerary: manualSchedule.itinerary,
+      activeDay: manualSchedule.activeDay,
+      activeSection: "itinerary",
+      routeMode: "manual",
+      modal: null,
+      editing: null,
+      editDraft: {},
+    });
     return;
   }
 
@@ -2519,6 +2631,113 @@ function toggleChecklist(kind, id) {
   setState({ [kind]: items });
 }
 
+function extractUrls(text) {
+  return Array.from(text.matchAll(/https?:\/\/[^\s,，\])」）]+/g), (match) => match[0].replace(/[.。]+$/, ""));
+}
+
+function isGoogleMapsUrl(value) {
+  try {
+    const url = new URL(value);
+    return /(^|\.)google\./i.test(url.hostname) || /(^|\.)goo\.gl$/i.test(url.hostname) || url.hostname === "maps.app.goo.gl";
+  } catch {
+    return false;
+  }
+}
+
+function decodeHtmlText(value) {
+  const unicodeDecoded = String(value || "")
+    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = unicodeDecoded;
+  return textarea.value;
+}
+
+function cleanPlaceCandidate(value) {
+  const cleaned = decodeHtmlText(value)
+    .replaceAll("\\/", "/")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/^[「『【\[(\s]+|[」』】\])\s]+$/g, "")
+    .trim();
+
+  if (cleaned.length < 2 || cleaned.length > 64) return "";
+  if (/https?:|www\.|@|^\d+$/.test(cleaned)) return "";
+  if (/Google|Maps|地圖|登入|隱私|條款|Cookie|搜尋|路線|分享|儲存|清單|評論|相片|附近|開啟|複製|查看|Sign in|Privacy|Terms|Reviews|Photos|Directions|Saved/i.test(cleaned)) {
+    return "";
+  }
+
+  return cleaned;
+}
+
+function pushPlaceCandidate(candidates, value) {
+  const cleaned = cleanPlaceCandidate(value);
+  if (cleaned) candidates.push(cleaned);
+}
+
+function extractPlaceNamesFromSharedPage(text) {
+  const decoded = decodeHtmlText(text);
+  const candidates = [];
+
+  Array.from(decoded.matchAll(/\/maps\/place\/([^/?#"\\]+)/g)).forEach((match) => {
+    pushPlaceCandidate(candidates, decodeURIComponent(match[1]).replace(/\+/g, " "));
+  });
+
+  Array.from(decoded.matchAll(/[?&](?:q|query)=([^&#"\\]+)/g)).forEach((match) => {
+    pushPlaceCandidate(candidates, decodeURIComponent(match[1]).replace(/\+/g, " "));
+  });
+
+  Array.from(decoded.matchAll(/"name"\s*:\s*"([^"]{2,80})"/g)).forEach((match) => {
+    pushPlaceCandidate(candidates, match[1]);
+  });
+
+  Array.from(decoded.matchAll(/aria-label=["']([^"']{2,80})["']/g)).forEach((match) => {
+    pushPlaceCandidate(candidates, match[1]);
+  });
+
+  decoded
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, "\n")
+    .split(/\n|  +/)
+    .forEach((line) => {
+      if (/[\u3040-\u30ff\u3400-\u9fff]/.test(line)) pushPlaceCandidate(candidates, line);
+    });
+
+  return [...new Set(candidates)].slice(0, 80);
+}
+
+function cityFromText(text) {
+  return /京都|kyoto|清水|祇園|伏見|嵐山|錦市場|河原町|二年坂|三年坂/i.test(text) ? "京都" : "大阪";
+}
+
+function buildImportedPlace(name, index, sourceText = "", area = "Google Maps") {
+  const city = cityFromText(`${name} ${sourceText}`);
+  const base = city === "京都" ? { lat: 35.0116, lng: 135.7681 } : { lat: 34.6937, lng: 135.5023 };
+
+  return {
+    id: `i${Date.now()}${index}`,
+    name,
+    city,
+    area,
+    lat: base.lat + (index % 4) * 0.01 - 0.015,
+    lng: base.lng + (index % 5) * 0.012 - 0.018,
+    stay: 75,
+    tag: "匯入",
+  };
+}
+
+function uniquePlaces(places, existing = []) {
+  const seen = new Set(existing.map((place) => place.name.trim().toLowerCase()));
+  return places.filter((place) => {
+    const key = place.name.trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
 function mapsNameFromLine(line, index) {
   const urlMatch = line.match(/https?:\/\/\S+/);
   if (!urlMatch) return "";
@@ -2532,10 +2751,10 @@ function mapsNameFromLine(line, index) {
     const placeName = url.pathname.split("/")[placeIndex + 1];
     if (placeName) return decodeURIComponent(placeName).replace(/\+/g, " ");
   } catch {
-    return `Google Maps 景點 ${index + 1}`;
+    return "";
   }
 
-  return `Google Maps 景點 ${index + 1}`;
+  return "";
 }
 
 function parseImport(text) {
@@ -2547,9 +2766,8 @@ function parseImport(text) {
       const normalizedLine = line.replaceAll("\t", ",").replaceAll("｜", ",").replaceAll("|", ",");
       const [rawName, cityRaw, areaRaw, stayRaw] = normalizedLine.split(",").map((part) => part?.trim());
       const name = rawName && !/^https?:\/\//.test(rawName) ? rawName : mapsNameFromLine(line, index);
-      const cityText = cityRaw || "";
-      const combinedText = `${line} ${cityText}`;
-      const city = /京都|kyoto|清水|祇園|伏見|嵐山|錦市場/i.test(combinedText) ? "京都" : "大阪";
+      if (!name) return null;
+      const city = cityFromText(`${line} ${cityRaw || ""}`);
       const base = city === "京都" ? { lat: 35.0116, lng: 135.7681 } : { lat: 34.6937, lng: 135.5023 };
       return {
         id: `i${Date.now()}${index}`,
@@ -2561,17 +2779,86 @@ function parseImport(text) {
         stay: Number(stayRaw) || 75,
         tag: "匯入",
       };
-    });
+    })
+    .filter(Boolean);
 }
 
-function importPlaces() {
-  const imported = parseImport(state.importText);
-  if (!imported.length) return;
+async function fetchSharedGoogleList(url) {
+  const candidates = [
+    { label: "直接讀取", url },
+    { label: "備援讀取", url: `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}` },
+    { label: "備援讀取", url: `https://corsproxy.io/?${encodeURIComponent(url)}` },
+  ];
+
+  let lastError = "";
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate.url, { redirect: "follow" });
+      if (!response.ok) throw new Error(`${response.status}`);
+      const text = await response.text();
+      const names = extractPlaceNamesFromSharedPage(text);
+      if (names.length) return names.map((name, index) => buildImportedPlace(name, index, text));
+      lastError = "連結可以讀取，但沒有找到景點名稱";
+    } catch (error) {
+      lastError = `${candidate.label}失敗`;
+    }
+  }
+
+  throw new Error(lastError || "無法讀取 Google 清單");
+}
+
+async function importPlaces() {
+  const sourceText = state.importText.trim();
+  if (!sourceText || state.importBusy) return;
+
+  const directRows = parseImport(sourceText);
+  const googleUrls = extractUrls(sourceText).filter(isGoogleMapsUrl);
+  let imported = [...directRows];
+
+  if (googleUrls.length) {
+    setState({
+      importBusy: true,
+      importStatus: "正在讀取 Google Maps 分享清單...",
+    });
+
+    const fetched = [];
+    const failed = [];
+    for (const url of googleUrls) {
+      try {
+        fetched.push(...(await fetchSharedGoogleList(url)));
+      } catch {
+        failed.push(url);
+      }
+    }
+
+    imported = [...imported, ...fetched];
+
+    if (failed.length && !fetched.length && !directRows.length) {
+      setState({
+        importBusy: false,
+        importStatus:
+          "這個 Google Maps 清單目前無法由網頁自動讀取。通常是清單未公開、Google 需要登入，或瀏覽器安全限制擋住。請把清單分享權限設為「知道連結的人可查看」後再試一次；若仍失敗，打開清單後複製景點名稱貼回這裡。",
+      });
+      return;
+    }
+  }
+
+  imported = uniquePlaces(imported, state.places);
+  if (!imported.length) {
+    setState({
+      importBusy: false,
+      importStatus: "沒有找到新的景點。請貼 Google Maps 公開分享清單連結，或貼上景點名稱清單。",
+    });
+    return;
+  }
+
   const places = [...state.places, ...imported];
   setState({
     places,
     itinerary: buildAutoItinerary(places),
     importText: "",
+    importStatus: "",
+    importBusy: false,
     modal: null,
     activeSection: "maps",
     routeMode: "auto",
@@ -2879,6 +3166,7 @@ function renderEditModal() {
           <button class="modal-close" data-action="closeModal">關閉</button>
           <h2>編輯景點</h2>
           <label class="form-row">名稱<input data-edit-field="name" value="${fieldValue("name")}" /></label>
+          <label class="form-row">時間<input data-edit-field="time" type="time" value="${fieldValue("time")}" /></label>
           <label class="form-row">城市<input data-edit-field="city" value="${fieldValue("city")}" /></label>
           <label class="form-row">區域<input data-edit-field="area" value="${fieldValue("area")}" /></label>
           <label class="form-row">分類<input data-edit-field="tag" value="${fieldValue("tag")}" /></label>
@@ -2972,14 +3260,23 @@ function renderModal() {
   }
 
   if (state.modal === "import") {
+    const importUrl = extractUrls(state.importText).find(isGoogleMapsUrl);
     return `
       <div class="modal-backdrop" data-action="closeModal">
         <section class="modal sticker" role="dialog" aria-modal="true" aria-labelledby="import-title">
           <button class="modal-close" data-action="closeModal">關閉</button>
           <h2 id="import-title">匯入 Google Maps 收藏</h2>
-          <p>貼上 Google Maps 儲存清單、分享連結或 CSV。每行一個景點，可用：名稱, 城市, 區域, 停留分鐘。</p>
-          <textarea id="importText" placeholder="例：&#10;大阪城天守閣, 大阪, 大阪城, 90&#10;https://maps.google.com/?q=清水寺&#10;伏見稻荷大社, 京都, 伏見, 100">${state.importText}</textarea>
-          <button class="primary wide" data-action="importPlaces">匯入並重新排程</button>
+          <p>貼上 Google Maps 分享清單連結，系統會自動嘗試讀取清單中的景點並排入行程。</p>
+          <textarea id="importText" placeholder="例：&#10;https://maps.app.goo.gl/你的分享清單連結&#10;&#10;若 Google 擋住讀取，也可貼：&#10;大阪城天守閣, 大阪, 大阪城, 90&#10;清水寺, 京都, 東山, 90">${state.importText}</textarea>
+          <div class="import-helper">
+            <strong>分享清單建議設為公開連結</strong>
+            <span>如果清單需要登入或不是公開分享，Google 可能不讓這個網頁直接讀取。</span>
+            ${importUrl ? `<a href="${safe(importUrl)}" target="_blank" rel="noreferrer">先開啟這個 Google 清單</a>` : ""}
+          </div>
+          ${state.importStatus ? `<div class="import-status">${safe(state.importStatus)}</div>` : ""}
+          <button class="primary wide" data-action="importPlaces" ${state.importBusy ? "disabled" : ""}>${
+            state.importBusy ? "讀取中..." : "自動匯入清單並排程"
+          }</button>
         </section>
       </div>
     `;
@@ -3300,7 +3597,7 @@ document.addEventListener("click", (event) => {
   if (action === "setAddCurrency") setState({ addCurrency: target.dataset.currency });
   if (action === "setRouteMode") setState({ routeMode: target.dataset.mode, activeSection: "maps" });
   if (action === "moveStop") moveStop(target.dataset.id, target.dataset.direction);
-  if (action === "openImport") setState({ modal: "import", activeSection: "maps" });
+  if (action === "openImport") setState({ modal: "import", activeSection: "maps", importStatus: "", importBusy: false });
   if (action === "importPlaces") importPlaces();
   if (action === "autoArrange") autoArrange();
   if (action === "openTripSettings") openTripSettings();
