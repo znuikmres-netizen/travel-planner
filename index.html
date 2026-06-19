@@ -7,7 +7,7 @@
       name="description"
       content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
-    <meta name="travel-planner-version" content="20260618-gray-tech-v3-no-image-query" />
+    <meta name="travel-planner-version" content="20260618-css-only-bg-v6" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -17,8 +17,8 @@
   --coffee-soft: rgba(95, 92, 112, 0.2);
   --taupe: rgba(255, 255, 255, 0.6);
   --taupe-strong: rgba(225, 219, 232, 0.76);
-  --yellow: #d8bfdc;
-  --yellow-deep: #9c7ca6;
+  --accent: #d8bfdc;
+  --accent-deep: #9c7ca6;
   --aqua: #6f86b7;
   --aqua-soft: #eef0f7;
   --panel: rgba(255, 255, 255, 0.68);
@@ -40,11 +40,12 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background:
-    radial-gradient(circle at 18% 12%, rgba(158, 137, 174, 0.2), transparent 28%),
-    radial-gradient(circle at 86% 18%, rgba(111, 134, 183, 0.18), transparent 26%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(239, 235, 244, 0.84)),
-    repeating-linear-gradient(0deg, rgba(34, 48, 57, 0.035) 0 1px, transparent 1px 28px),
-    repeating-linear-gradient(90deg, rgba(34, 48, 57, 0.03) 0 1px, transparent 1px 28px),
+    radial-gradient(circle at 12% 8%, rgba(184, 120, 146, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 16%, rgba(111, 134, 183, 0.2), transparent 28%),
+    radial-gradient(circle at 50% 92%, rgba(156, 124, 166, 0.16), transparent 32%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 235, 244, 0.86)),
+    repeating-linear-gradient(0deg, rgba(39, 48, 63, 0.035) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(39, 48, 63, 0.028) 0 1px, transparent 1px 28px),
     var(--ivory);
   background-attachment: fixed;
   overflow-x: hidden;
@@ -70,19 +71,6 @@ button {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-.background-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.58;
-  pointer-events: none;
-  filter: saturate(0.82) contrast(0.96);
-  mix-blend-mode: normal;
 }
 
 .app-shell {
@@ -420,12 +408,45 @@ a {
   align-content: start;
 }
 
-.map-box img {
+.map-preview {
+  position: relative;
   width: 100%;
   aspect-ratio: 1.28;
+  overflow: hidden;
   border: 1.5px solid var(--line);
   border-radius: 8px;
-  object-fit: cover;
+  background:
+    radial-gradient(circle at 28% 30%, rgba(216, 191, 220, 0.86) 0 8px, transparent 9px),
+    radial-gradient(circle at 64% 52%, rgba(111, 134, 183, 0.72) 0 7px, transparent 8px),
+    radial-gradient(circle at 42% 76%, rgba(184, 120, 146, 0.66) 0 6px, transparent 7px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.84), rgba(238, 240, 247, 0.72)),
+    repeating-linear-gradient(0deg, rgba(39, 48, 63, 0.055) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(90deg, rgba(39, 48, 63, 0.045) 0 1px, transparent 1px 18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.map-preview::before {
+  content: "";
+  position: absolute;
+  inset: 22% 18% 18% 22%;
+  border-top: 3px solid rgba(111, 134, 183, 0.66);
+  border-right: 3px solid rgba(111, 134, 183, 0.48);
+  border-radius: 48% 34% 42% 28%;
+  transform: rotate(18deg);
+}
+
+.map-preview::after {
+  content: "ROUTE";
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 4px 8px;
+  border: 1px solid rgba(80, 82, 112, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--coffee);
+  font-size: 10px;
+  font-weight: 950;
 }
 
 .map-box a,
@@ -501,7 +522,7 @@ a {
   min-height: 46px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(232, 248, 251, 0.78));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(238, 240, 247, 0.8));
   box-shadow: 0 9px 18px rgba(45, 70, 86, 0.1);
   font-size: 24px;
   font-weight: 950;
@@ -510,10 +531,10 @@ a {
 
 .calc-grid button.equals,
 .primary {
-  border: 1px solid rgba(217, 173, 40, 0.62);
+  border: 1px solid rgba(156, 124, 166, 0.62);
   border-radius: 8px;
-  background: linear-gradient(135deg, var(--yellow), rgba(111, 134, 183, 0.22));
-  box-shadow: 0 12px 24px rgba(217, 173, 40, 0.18);
+  background: linear-gradient(135deg, var(--accent), rgba(111, 134, 183, 0.22));
+  box-shadow: 0 12px 24px rgba(111, 134, 183, 0.18);
   color: var(--ink);
   font-weight: 950;
   cursor: pointer;
@@ -581,7 +602,7 @@ a {
   padding: 10px 12px;
   border: 1px solid rgba(111, 134, 183, 0.36);
   border-radius: 8px;
-  background: rgba(232, 248, 251, 0.66);
+  background: rgba(238, 240, 247, 0.72);
   box-shadow: 0 8px 18px rgba(111, 134, 183, 0.12);
   margin-bottom: 10px;
   font-weight: 950;
@@ -742,7 +763,7 @@ a {
 .ledger-row em {
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(232, 248, 251, 0.86);
+  background: rgba(238, 240, 247, 0.88);
   color: var(--coffee-deep);
   font-size: 12px;
   font-style: normal;
@@ -854,7 +875,7 @@ a {
   width: 10px;
   height: 28px;
   border-radius: 8px;
-  background: var(--yellow);
+  background: var(--accent);
   transform: rotate(28deg);
 }
 
@@ -884,7 +905,7 @@ a {
   bottom: 24px;
   width: min(680px, calc(100vw - 48px));
   height: 62px;
-  border: 1px solid rgba(217, 173, 40, 0.58);
+  border: 1px solid rgba(156, 124, 166, 0.58);
   background: linear-gradient(135deg, rgba(216, 191, 220, 0.96), rgba(255, 255, 255, 0.72));
   transform: translateX(-50%);
   font-size: 28px;
@@ -990,7 +1011,7 @@ a {
   padding: 10px;
   border: 1px dashed rgba(111, 134, 183, 0.56);
   border-radius: 8px;
-  background: rgba(232, 248, 251, 0.58);
+  background: rgba(238, 240, 247, 0.64);
   margin-bottom: 10px;
 }
 
@@ -1057,7 +1078,7 @@ a {
 }
 
 .segmented button.active {
-  background: var(--yellow);
+  background: var(--accent);
 }
 
 .rate-drawer {
@@ -1232,10 +1253,6 @@ a {
     padding: 10px 10px 196px;
   }
 
-  .background-layer {
-    opacity: 0.5;
-  }
-
   .workspace {
     width: 100%;
     margin: 0;
@@ -1301,11 +1318,14 @@ a {
 
   .maps-card {
     grid-column: 1 / -1;
-    order: 3;
   }
 
   .check-card {
     grid-column: span 1;
+    order: 3;
+  }
+
+  .maps-card {
     order: 4;
   }
 
@@ -1318,7 +1338,7 @@ a {
   .card.is-focused {
     outline-width: 3px;
     outline-offset: 2px;
-    box-shadow: 6px 6px 0 var(--yellow-deep), 10px 10px 0 var(--shadow);
+    box-shadow: 6px 6px 0 var(--accent-deep), 10px 10px 0 var(--shadow);
     transform: translate(-1px, -1px);
   }
 
@@ -1397,10 +1417,6 @@ a {
     max-height: none;
     overflow-y: visible;
     padding-right: 2px;
-  }
-
-  .timeline-row:nth-child(n + 6) {
-    display: none;
   }
 
   .timeline-row {
@@ -1747,7 +1763,6 @@ a {
 </style>
   </head>
   <body>
-    <img class="background-layer" src="./assets/travel-tech-bg.png" alt="" aria-hidden="true" />
     <div id="app"></div>
     <script>const defaultExchangeRate = 0.19678;
 const defaultRateMeta = {
@@ -1761,7 +1776,7 @@ const initialDays = [
     id: "d1",
     label: "D1 大阪",
     date: "6/22",
-    weekday: "日",
+    weekday: "一",
     city: "大阪",
     seed: { lat: 34.7055, lng: 135.4983 },
   },
@@ -1769,7 +1784,7 @@ const initialDays = [
     id: "d2",
     label: "D2 京都",
     date: "6/23",
-    weekday: "一",
+    weekday: "二",
     city: "京都",
     seed: { lat: 35.0116, lng: 135.7681 },
   },
@@ -1777,7 +1792,7 @@ const initialDays = [
     id: "d3",
     label: "D3 大阪",
     date: "6/24",
-    weekday: "二",
+    weekday: "三",
     city: "大阪",
     seed: { lat: 34.6654, lng: 135.4323 },
   },
@@ -1785,7 +1800,7 @@ const initialDays = [
     id: "d4",
     label: "D4 大阪",
     date: "6/25",
-    weekday: "三",
+    weekday: "四",
     city: "大阪",
     seed: { lat: 34.667, lng: 135.5038 },
   },
@@ -1957,13 +1972,26 @@ const foodItems = [
 ];
 
 const storageKey = "osakaKyotoTravelPlannerV4";
+const tripWeekdayByDate = {
+  "6/22": "一",
+  "6/23": "二",
+  "6/24": "三",
+  "6/25": "四",
+};
+
+function normalizeTripDay(day) {
+  return {
+    ...day,
+    weekday: tripWeekdayByDate[day.date] || day.weekday,
+  };
+}
 
 let state = {
   tripTitle: "大阪・京都",
   tripDates: "6/22-6/25",
   exchangeRate: defaultExchangeRate,
   rateMeta: { ...defaultRateMeta },
-  days: initialDays.map((day) => ({ ...day, seed: { ...day.seed } })),
+  days: initialDays.map((day) => normalizeTripDay({ ...day, seed: { ...day.seed } })),
   activeDay: "d1",
   activeSection: "home",
   places: [...initialPlaces],
@@ -2144,8 +2172,11 @@ function loadSavedState() {
     const ledger = (saved.ledger || previousState.ledger).map(normalizeExpense);
     state = previousState;
 
+    const normalizedDays = (saved.days || merged.days || state.days).map(normalizeTripDay);
+
     state = {
       ...merged,
+      days: normalizedDays,
       modal: null,
       drawerOpen: false,
       importText: "",
@@ -2657,9 +2688,6 @@ function renderImagePreview(image, alt = "清單圖片") {
 
 function renderImageControls(target, image = "") {
   return `
-    <label class="form-row image-field">圖片網址
-      <input ${target === "edit" ? 'data-edit-field="image"' : 'id="addImage"'} value="${safe(image)}" placeholder="可貼圖片網址，也可直接上傳" />
-    </label>
     <label class="form-row file-field">上傳圖片
       <input type="file" accept="image/*" data-image-target="${target}" />
     </label>
@@ -2950,7 +2978,7 @@ function renderModal() {
           <button class="modal-close" data-action="closeModal">關閉</button>
           <h2 id="import-title">匯入 Google Maps 收藏</h2>
           <p>貼上 Google Maps 儲存清單、分享連結或 CSV。每行一個景點，可用：名稱, 城市, 區域, 停留分鐘。</p>
-          <textarea id="importText" placeholder="例：%0A大阪城天守閣, 大阪, 大阪城, 90%0Ahttps://maps.google.com/?q=清水寺%0A伏見稻荷大社, 京都, 伏見, 100">${state.importText}</textarea>
+          <textarea id="importText" placeholder="例：&#10;大阪城天守閣, 大阪, 大阪城, 90&#10;https://maps.google.com/?q=清水寺&#10;伏見稻荷大社, 京都, 伏見, 100">${state.importText}</textarea>
           <button class="primary wide" data-action="importPlaces">匯入並重新排程</button>
         </section>
       </div>
@@ -3034,15 +3062,18 @@ function renderModal() {
 
 function renderDrawer() {
   if (!state.drawerOpen) return "";
-  const yen = Number(state.yenInput || 0);
+  const amount = Number(state.yenInput || 0);
+  const activeCurrency = state.expenseCurrency;
+  const convertedCurrency = activeCurrency === "JPY" ? "TWD" : "JPY";
+  const convertedValue = activeCurrency === "JPY" ? twdFromYen(amount) : yenFromTwd(amount);
   return `
     <aside class="rate-drawer sticker" aria-label="浮動匯率計算機">
       <button class="modal-close" data-action="toggleDrawer">收起</button>
       <h2>匯率計算機</h2>
-      <p>JPY -> TWD · 匯率 ${formatRate()}<span>${rateSourceText()}</span></p>
+      <p>${activeCurrency} -> ${convertedCurrency} · 匯率 ${formatRate()}<span>${rateSourceText()}</span></p>
       <div class="mini-result">
-        <span>¥${yen.toLocaleString()}</span>
-        <strong>NT$${twdFromYen(yen).toLocaleString()}</strong>
+        <span>${formatMoney(amount, activeCurrency)}</span>
+        <strong>${formatMoney(convertedValue, convertedCurrency)}</strong>
       </div>
       <div class="mini-keys">
         ${["7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00", "back"]
@@ -3103,7 +3134,7 @@ function render() {
       <section class="workspace">
         <header class="page-header">
           <div>
-            <p>Travel Planner · 紫灰新版 2026/06/18</p>
+            <p>Travel Planner</p>
             <h1>${safe(state.tripTitle)} <span>${safe(state.tripDates)}</span></h1>
           </div>
           <div class="header-actions">
@@ -3121,7 +3152,7 @@ function render() {
             <div class="itinerary-body">
               <div class="timeline">${renderTimeline()}</div>
               <div class="map-box">
-                <img src="./assets/map-preview.png" alt="順路排程地圖預覽" />
+                <div class="map-preview" aria-label="順路排程地圖預覽"></div>
                 <a href="${mapsUrl()}" target="_blank" rel="noreferrer">在 Google Maps 打開路線</a>
               </div>
             </div>
@@ -3133,7 +3164,7 @@ function render() {
               <button class="ghost-button" data-action="openLedger">記帳紀錄</button>
             </div>
             <div class="rate-line">
-              <span>JPY -> TWD<small>${rateSourceText()}</small></span>
+              <span>日幣 / 台幣匯率<small>${rateSourceText()}</small></span>
               <strong>匯率 ${formatRate()}</strong>
             </div>
             <div class="expense-tools">
