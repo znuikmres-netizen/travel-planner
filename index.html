@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
+      content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 導航 App"
     />
-    <meta name="travel-planner-version" content="20260620-cloud-sync-v1" />
+    <meta name="travel-planner-version" content="20260620-itinerary-navigation-v1" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -187,8 +187,8 @@ a {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(390px, 1.08fr);
   grid-template-areas:
     "itinerary itinerary expense"
-    "packing shopping maps"
-    "food notes maps";
+    "packing shopping expense"
+    "food notes expense";
   gap: 20px;
   align-items: stretch;
   min-width: 0;
@@ -217,10 +217,6 @@ a {
 .expense-card {
   grid-area: expense;
   min-height: 430px;
-}
-
-.maps-card {
-  grid-area: maps;
 }
 
 [data-section-card="packing"] {
@@ -721,8 +717,13 @@ a {
   flex-wrap: wrap;
 }
 
-.row-actions button {
+.row-actions button,
+.row-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 28px;
+  padding: 2px 7px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.68);
@@ -1223,7 +1224,7 @@ a {
   .side-nav {
     position: static;
     width: 100%;
-    grid-template-columns: repeat(9, minmax(70px, 1fr));
+    grid-template-columns: repeat(8, minmax(70px, 1fr));
     margin-bottom: 18px;
     overflow-x: auto;
   }
@@ -1242,14 +1243,12 @@ a {
   [data-section-card="packing"],
   [data-section-card="souvenir"],
   .food-card,
-  .notes-card,
-  .maps-card {
+  .notes-card {
     grid-area: auto;
   }
 
   .itinerary-card,
-  .expense-card,
-  .maps-card {
+  .expense-card {
     grid-column: span 2;
   }
 }
@@ -1401,17 +1400,9 @@ a {
     order: 2;
   }
 
-  .maps-card {
-    grid-column: 1 / -1;
-  }
-
   .check-card {
     grid-column: span 1;
     order: 3;
-  }
-
-  .maps-card {
-    order: 4;
   }
 
   .card {
@@ -1722,7 +1713,8 @@ a {
     gap: 4px;
   }
 
-  .row-actions button {
+  .row-actions button,
+  .row-actions a {
     min-width: 28px;
     min-height: 24px;
     padding: 2px 6px;
@@ -2220,8 +2212,10 @@ function distance(a, b) {
 }
 
 function formatTime(minutes) {
-  const h = Math.floor(minutes / 60).toString().padStart(2, "0");
-  const m = (minutes % 60).toString().padStart(2, "0");
+  const dayMinutes = 24 * 60;
+  const normalized = ((Math.round(Number(minutes) || 0) % dayMinutes) + dayMinutes) % dayMinutes;
+  const h = Math.floor(normalized / 60).toString().padStart(2, "0");
+  const m = (normalized % 60).toString().padStart(2, "0");
   return `${h}:${m}`;
 }
 
@@ -2282,25 +2276,38 @@ function buildAutoItinerary(places) {
 }
 
 function stopSortTime(stop) {
-  const match = String(stop.time || "").match(/^(\d{1,2}):(\d{2})$/);
+  const match = normalizeTimeInput(stop.time, "").match(/^(\d{2}):(\d{2})$/);
   if (!match) return 24 * 60;
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+function normalizeItineraryTimes(itinerary) {
+  return Object.fromEntries(
+    state.days.map((day) => [
+      day.id,
+      (itinerary?.[day.id] || []).map((stop) => ({
+        ...stop,
+        time: normalizeTimeInput(stop.time, "09:00"),
+      })),
+    ]),
+  );
+}
+
 function mergeItineraryWithPlaces(existingItinerary, places) {
   if (!existingItinerary) return buildAutoItinerary(places);
+  const normalizedExisting = normalizeItineraryTimes(existingItinerary);
 
   const scheduledIds = new Set(
-    Object.values(existingItinerary)
+    Object.values(normalizedExisting)
       .flat()
       .map((stop) => stop.id),
   );
   const missingPlaces = places.filter((place) => !scheduledIds.has(place.id));
-  if (!missingPlaces.length) return existingItinerary;
+  if (!missingPlaces.length) return normalizedExisting;
 
   const autoItinerary = buildAutoItinerary(places);
   const merged = Object.fromEntries(
-    state.days.map((day) => [day.id, [...(existingItinerary[day.id] || [])]]),
+    state.days.map((day) => [day.id, [...(normalizedExisting[day.id] || [])]]),
   );
 
   missingPlaces.forEach((place) => {
@@ -2411,11 +2418,11 @@ function applyStateSnapshot(saved) {
   const mergedPlaces = mergePlaces(saved.places || merged.places || state.places, googleSavedPlaces);
 
   state = {
-    ...merged,
-    updatedAt: saved.updatedAt || merged.updatedAt || Date.now(),
-    days: normalizedDays,
-    modal: null,
-    drawerOpen: false,
+      ...merged,
+      updatedAt: saved.updatedAt || merged.updatedAt || Date.now(),
+      days: normalizedDays,
+      modal: null,
+      drawerOpen: false,
     importText: "",
     importStatus: "",
     importBusy: false,
@@ -2424,10 +2431,11 @@ function applyStateSnapshot(saved) {
     addName: "",
     addDetail: "",
     addCurrency: "JPY",
-    addImage: "",
-    editing: null,
-    editDraft: {},
-    places: mergedPlaces,
+      addImage: "",
+      editing: null,
+      editDraft: {},
+      activeSection: merged.activeSection === "maps" ? "itinerary" : merged.activeSection,
+      places: mergedPlaces,
     ledger,
     souvenirs: (saved.souvenirs || state.souvenirs).map((item) => ({ image: "", ...item })),
     foods: saved.foods || state.foods,
@@ -2624,6 +2632,7 @@ async function pullCloudState(options = {}) {
 
 function mapsUrl(stops = getCurrentStops()) {
   if (!stops.length) return "https://www.google.com/maps";
+  if (stops.length === 1) return placeMapsUrl(stops[0]);
   const encoded = stops.map((stop) => encodeURIComponent(`${stop.name} ${stop.city}`));
   const origin = encoded[0];
   const destination = encoded[encoded.length - 1];
@@ -2633,7 +2642,15 @@ function mapsUrl(stops = getCurrentStops()) {
   }&travelmode=walking`;
 }
 
-const scrollSelectors = [".date-tabs", ".timeline", ".check-list", ".place-list", ".notes-list", ".ledger-list", ".modal"];
+function placeMapsUrl(stop) {
+  const destination =
+    Number.isFinite(Number(stop.lat)) && Number.isFinite(Number(stop.lng))
+      ? `${stop.lat},${stop.lng}`
+      : `${stop.name} ${stop.city || ""}`;
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}&travelmode=walking`;
+}
+
+const scrollSelectors = [".date-tabs", ".timeline", ".check-list", ".notes-list", ".ledger-list", ".modal"];
 
 function captureScrollState() {
   return {
@@ -2725,20 +2742,21 @@ function fieldValue(key) {
 }
 
 function minutesFromTime(value) {
-  const match = String(value || "").match(/^(\d{1,2}):(\d{2})$/);
+  const time = normalizeTimeInput(value, "");
+  const match = time.match(/^(\d{2}):(\d{2})$/);
   if (!match) return 24 * 60;
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
 function normalizeTimeInput(value, fallback = "09:00") {
   const text = String(value || "").trim();
-  const match = text.match(/^(\d{1,2})(?::?(\d{2}))?$/);
+  const match = text.match(/^(\d{1,3})(?::?(\d{2}))?$/);
   if (!match) return fallback;
 
   const hours = Number(match[1]);
   const minutes = Number(match[2] || 0);
-  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return fallback;
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  if (hours < 0 || minutes < 0 || minutes > 59) return fallback;
+  return `${String(hours % 24).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
 function findItineraryStop(id) {
@@ -2800,7 +2818,7 @@ function openEdit(type, id, kind = "") {
       editDraft: {
         ...place,
         day: place.day || scheduled?.dayId || state.activeDay,
-        time: scheduled?.stop?.time || "09:00",
+        time: normalizeTimeInput(scheduled?.stop?.time, "09:00"),
       },
     });
     return;
@@ -3239,7 +3257,7 @@ async function importPlaces() {
     importStatus: "",
     importBusy: false,
     modal: null,
-    activeSection: "maps",
+    activeSection: "itinerary",
     routeMode: "auto",
   });
 }
@@ -3311,7 +3329,7 @@ function addItem() {
       addName: "",
       addDetail: "",
       modal: null,
-      activeSection: "maps",
+      activeSection: "itinerary",
     });
     return;
   }
@@ -3390,14 +3408,14 @@ function renderDateTabs() {
 function renderTimeline() {
   const stops = getCurrentStops();
   if (!stops.length) {
-    return `<div class="empty-note">尚未排入景點，先從 Google Maps 收藏匯入。</div>`;
+    return `<div class="empty-note">尚未排入景點，按下方「+ 新增」加入景點後會排入行程。</div>`;
   }
 
   return stops
     .map(
       (stop, index) => `
         <div class="timeline-row">
-          <div class="time">${stop.time}</div>
+          <div class="time">${normalizeTimeInput(stop.time, "09:00")}</div>
           <div class="rail"><span></span></div>
           <div class="stop-copy">
             <div class="stop-title">
@@ -3408,6 +3426,7 @@ function renderTimeline() {
               index ? ` · 前段車程約 ${stop.travel} 分` : ""
             }</p>
             <div class="row-actions">
+              <a href="${placeMapsUrl(stop)}" target="_blank" rel="noreferrer">導航</a>
               <button data-action="moveStop" data-id="${stop.id}" data-direction="up">上</button>
               <button data-action="moveStop" data-id="${stop.id}" data-direction="down">下</button>
               <button data-action="edit" data-type="place" data-id="${stop.id}">編</button>
@@ -3652,29 +3671,6 @@ function renderModal() {
     return renderEditModal();
   }
 
-  if (state.modal === "import") {
-    const importUrl = extractUrls(state.importText).find(isGoogleMapsUrl);
-    return `
-      <div class="modal-backdrop" data-action="closeModal">
-        <section class="modal sticker" role="dialog" aria-modal="true" aria-labelledby="import-title">
-          <button class="modal-close" data-action="closeModal">關閉</button>
-          <h2 id="import-title">匯入 Google Maps 收藏</h2>
-          <p>貼上 Google Maps 分享清單連結，系統會自動嘗試讀取清單中的景點並排入行程。</p>
-          <textarea id="importText" placeholder="例：&#10;https://maps.app.goo.gl/你的分享清單連結&#10;&#10;若 Google 擋住讀取，也可貼：&#10;大阪城天守閣, 大阪, 大阪城, 90&#10;清水寺, 京都, 東山, 90">${state.importText}</textarea>
-          <div class="import-helper">
-            <strong>分享清單建議設為公開連結</strong>
-            <span>如果清單需要登入或不是公開分享，Google 可能不讓這個網頁直接讀取。</span>
-            ${importUrl ? `<a href="${safe(importUrl)}" target="_blank" rel="noreferrer">先開啟這個 Google 清單</a>` : ""}
-          </div>
-          ${state.importStatus ? `<div class="import-status">${safe(state.importStatus)}</div>` : ""}
-          <button class="primary wide" data-action="importPlaces" ${state.importBusy ? "disabled" : ""}>${
-            state.importBusy ? "讀取中..." : "自動匯入清單並排程"
-          }</button>
-        </section>
-      </div>
-    `;
-  }
-
   if (state.modal === "ledger") {
     return `
       <div class="modal-backdrop" data-action="closeModal">
@@ -3790,7 +3786,6 @@ function readImageFile(file, target) {
 }
 
 function render() {
-  const currentDay = getCurrentDay();
   const yen = Number(state.yenInput || 0);
   const activeCurrency = state.expenseCurrency;
   const convertedCurrency = activeCurrency === "JPY" ? "TWD" : "JPY";
@@ -3811,7 +3806,6 @@ function render() {
           ["souvenir", "購物清單"],
           ["food", "必吃清單"],
           ["notes", "備註"],
-          ["maps", "地圖收藏"],
           ["settings", "設定"],
         ]
           .map(
@@ -3920,44 +3914,6 @@ function render() {
             <div class="notes-list">${renderNotes()}</div>
           </article>
 
-          <article class="${cardClass("maps", "maps-card")}" data-section-card="maps">
-            <div class="card-title">
-              <h2>Google Maps 收藏</h2>
-              <button class="ghost-button" data-action="openImport">匯入景點</button>
-            </div>
-            <div class="maps-content">
-              <div class="place-list">
-                <div class="list-head">
-                  <span>已匯入景點 (${state.places.length} 個)</span>
-                  <strong>${currentDay.label}</strong>
-                </div>
-                ${renderPlaces()}
-              </div>
-              <div class="route-panel">
-                <h3>順路排程</h3>
-                <div class="route-mode">
-                  <button class="${state.routeMode === "auto" ? "active" : ""}" data-action="autoArrange">自動排程</button>
-                  <button class="${state.routeMode === "manual" ? "active" : ""}" data-action="setRouteMode" data-mode="manual">手動調整</button>
-                </div>
-                <label>
-                  選擇日期
-                  <select data-action="selectDay">
-                    ${state.days
-                      .map(
-                        (day) =>
-                          `<option value="${day.id}" ${day.id === state.activeDay ? "selected" : ""}>${day.label} ${day.date}</option>`,
-                      )
-                      .join("")}
-                  </select>
-                </label>
-                <div class="route-doodle">
-                  <span></span><i></i><span></span>
-                </div>
-                <p class="route-hint">${state.routeMode === "manual" ? "到行程表用每個景點旁的「上 / 下」調整順序。" : "匯入收藏後，會依城市與距離自動排順路。"}</p>
-                <a href="${mapsUrl()}" target="_blank" rel="noreferrer" class="outline-link">查看排程結果</a>
-              </div>
-            </div>
-          </article>
         </section>
       </section>
 
@@ -3983,16 +3939,11 @@ document.addEventListener("click", (event) => {
     }
   }
   if (action === "day") setState({ activeDay: target.dataset.day, activeSection: "itinerary" });
-  if (action === "selectDay") return;
   if (action === "calc") handleCalc(target.dataset.key);
   if (action === "toggle") toggleChecklist(target.dataset.kind, target.dataset.id);
   if (action === "setExpenseCurrency") setState({ expenseCurrency: target.dataset.currency });
   if (action === "setAddCurrency") setState({ addCurrency: target.dataset.currency });
-  if (action === "setRouteMode") setState({ routeMode: target.dataset.mode, activeSection: "maps" });
   if (action === "moveStop") moveStop(target.dataset.id, target.dataset.direction);
-  if (action === "openImport") setState({ modal: "import", activeSection: "maps", importStatus: "", importBusy: false });
-  if (action === "importPlaces") importPlaces();
-  if (action === "autoArrange") autoArrange();
   if (action === "openTripSettings") openTripSettings();
   if (action === "pullCloud") pullCloudState({ force: true });
   if (action === "pushCloud") pushCloudState();
@@ -4015,9 +3966,6 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("change", (event) => {
-  const select = event.target.closest("select[data-action='selectDay']");
-  if (select) setState({ activeDay: select.value, activeSection: "maps" });
-
   const displayCurrency = event.target.closest("select[data-action='displayCurrency']");
   if (displayCurrency) setState({ displayCurrency: displayCurrency.value });
 
