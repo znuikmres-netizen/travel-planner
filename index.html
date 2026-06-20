@@ -7,7 +7,7 @@
       name="description"
       content="6/22-6/25 大阪與京都旅遊規劃、記帳、行李、購物清單、必吃清單、備註與 Google Maps 收藏順路排程 App"
     />
-    <meta name="travel-planner-version" content="20260619-google-list-places-v1" />
+    <meta name="travel-planner-version" content="20260620-cloud-sync-v1" />
     <title>大阪・京都 6/22-6/25 旅遊規劃</title>
     <style>:root {
   --ivory: #f7f3f8;
@@ -994,6 +994,53 @@ a {
 
 .modal input {
   margin-bottom: 12px;
+}
+
+.sync-panel {
+  display: grid;
+  gap: 10px;
+  margin: 4px 0 16px;
+  padding: 13px;
+  border: 1px solid rgba(111, 134, 183, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.46);
+}
+
+.sync-panel h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.sync-status {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px dashed rgba(111, 134, 183, 0.34);
+  border-radius: 8px;
+  background: rgba(238, 240, 247, 0.52);
+}
+
+.sync-status strong {
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.sync-status span {
+  color: var(--coffee);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.sync-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ghost-button:disabled {
+  cursor: progress;
+  opacity: 0.58;
 }
 
 .form-row {
@@ -2063,6 +2110,15 @@ const foodItems = [
 ];
 
 const storageKey = "osakaKyotoTravelPlannerV4";
+const syncConfigKey = `${storageKey}:cloudSync`;
+const builtInSyncConfig = {
+  enabled: false,
+  url: "",
+  token: "",
+};
+let hasSavedLocalState = false;
+let syncTimer = null;
+let syncSuspended = false;
 const tripWeekdayByDate = {
   "6/22": "一",
   "6/23": "二",
@@ -2087,7 +2143,40 @@ function mergePlaces(basePlaces, additions) {
   });
 }
 
+function normalizeSyncConfig(config = {}) {
+  const url = String(config.url || builtInSyncConfig.url || "").trim();
+  const token = String(config.token || builtInSyncConfig.token || "").trim();
+  return {
+    enabled: Boolean(config.enabled ?? builtInSyncConfig.enabled) && Boolean(url),
+    url,
+    token,
+    status: config.status || (url ? "同步待啟用" : "尚未設定同步"),
+    busy: Boolean(config.busy),
+    lastPulledAt: config.lastPulledAt || "",
+    lastPushedAt: config.lastPushedAt || "",
+  };
+}
+
+function loadSyncConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(syncConfigKey) || "null");
+    return normalizeSyncConfig(saved || builtInSyncConfig);
+  } catch {
+    return normalizeSyncConfig(builtInSyncConfig);
+  }
+}
+
+function saveSyncConfig(sync = state.sync) {
+  try {
+    const { enabled, url, token, lastPulledAt, lastPushedAt, status } = sync;
+    localStorage.setItem(syncConfigKey, JSON.stringify({ enabled, url, token, lastPulledAt, lastPushedAt, status }));
+  } catch {
+    // Sync settings are optional; the app still works locally if storage is unavailable.
+  }
+}
+
 let state = {
+  updatedAt: Date.now(),
   tripTitle: "大阪・京都",
   tripDates: "6/22-6/25",
   exchangeRate: defaultExchangeRate,
@@ -2114,6 +2203,7 @@ let state = {
   importText: "",
   importStatus: "",
   importBusy: false,
+  sync: loadSyncConfig(),
   addKind: "spot",
   addName: "",
   addDetail: "",
@@ -2273,69 +2363,87 @@ function totalExpense(currency = state.displayCurrency) {
   return currency === "TWD" ? totalTwd : yenFromTwd(totalTwd);
 }
 
+function buildStateSnapshot() {
+  return {
+    schemaVersion: 2,
+    updatedAt: state.updatedAt || Date.now(),
+    tripTitle: state.tripTitle,
+    tripDates: state.tripDates,
+    exchangeRate: state.exchangeRate,
+    rateMeta: state.rateMeta,
+    days: state.days,
+    activeDay: state.activeDay,
+    activeSection: state.activeSection,
+    places: state.places,
+    itinerary: state.itinerary,
+    yenInput: state.yenInput,
+    expenseCurrency: state.expenseCurrency,
+    displayCurrency: state.displayCurrency,
+    routeMode: state.routeMode,
+    ledger: state.ledger.map(normalizeExpense),
+    packing: state.packing,
+    souvenirs: state.souvenirs,
+    foods: state.foods,
+    notes: state.notes,
+  };
+}
+
 function saveState() {
   try {
-    const snapshot = {
-      tripTitle: state.tripTitle,
-      tripDates: state.tripDates,
-      exchangeRate: state.exchangeRate,
-      rateMeta: state.rateMeta,
-      days: state.days,
-      activeDay: state.activeDay,
-      activeSection: state.activeSection,
-      places: state.places,
-      itinerary: state.itinerary,
-      yenInput: state.yenInput,
-      expenseCurrency: state.expenseCurrency,
-      displayCurrency: state.displayCurrency,
-      routeMode: state.routeMode,
-      ledger: state.ledger.map(normalizeExpense),
-      packing: state.packing,
-      souvenirs: state.souvenirs,
-      foods: state.foods,
-      notes: state.notes,
-    };
+    if (!syncSuspended) state.updatedAt = Date.now();
+    const snapshot = buildStateSnapshot();
     localStorage.setItem(storageKey, JSON.stringify(snapshot));
+    if (!syncSuspended) scheduleCloudSave();
   } catch {
     // Local storage can be unavailable in private browsing; the app still works in memory.
   }
 }
 
+function applyStateSnapshot(saved) {
+  if (!saved) return false;
+  const merged = { ...state, ...saved };
+  const previousState = state;
+  state = { ...state, exchangeRate: merged.exchangeRate };
+  const ledger = (saved.ledger || previousState.ledger).map(normalizeExpense);
+  state = previousState;
+
+  const normalizedDays = (saved.days || merged.days || state.days).map(normalizeTripDay);
+  const mergedPlaces = mergePlaces(saved.places || merged.places || state.places, googleSavedPlaces);
+
+  state = {
+    ...merged,
+    updatedAt: saved.updatedAt || merged.updatedAt || Date.now(),
+    days: normalizedDays,
+    modal: null,
+    drawerOpen: false,
+    importText: "",
+    importStatus: "",
+    importBusy: false,
+    sync: state.sync,
+    addKind: "spot",
+    addName: "",
+    addDetail: "",
+    addCurrency: "JPY",
+    addImage: "",
+    editing: null,
+    editDraft: {},
+    places: mergedPlaces,
+    ledger,
+    souvenirs: (saved.souvenirs || state.souvenirs).map((item) => ({ image: "", ...item })),
+    foods: saved.foods || state.foods,
+    notes: (saved.notes || state.notes).map((item) => ({ title: "", body: "", image: "", ...item })),
+    itinerary: mergeItineraryWithPlaces(saved.itinerary, mergedPlaces),
+  };
+  return true;
+}
+
 function loadSavedState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+    const raw = localStorage.getItem(storageKey);
+    const saved = JSON.parse(raw || "null");
     if (!saved) return;
-    const merged = { ...state, ...saved };
-    const previousState = state;
-    state = { ...state, exchangeRate: merged.exchangeRate };
-    const ledger = (saved.ledger || previousState.ledger).map(normalizeExpense);
-    state = previousState;
-
-    const normalizedDays = (saved.days || merged.days || state.days).map(normalizeTripDay);
-    const mergedPlaces = mergePlaces(saved.places || merged.places || state.places, googleSavedPlaces);
-
-    state = {
-      ...merged,
-      days: normalizedDays,
-      modal: null,
-      drawerOpen: false,
-      importText: "",
-      importStatus: "",
-      importBusy: false,
-      addKind: "spot",
-      addName: "",
-      addDetail: "",
-      addCurrency: "JPY",
-      addImage: "",
-      editing: null,
-      editDraft: {},
-      places: mergedPlaces,
-      ledger,
-      souvenirs: (saved.souvenirs || state.souvenirs).map((item) => ({ image: "", ...item })),
-      foods: saved.foods || state.foods,
-      notes: (saved.notes || state.notes).map((item) => ({ title: "", body: "", image: "", ...item })),
-      itinerary: mergeItineraryWithPlaces(saved.itinerary, mergedPlaces),
-    };
+    hasSavedLocalState = true;
+    applyStateSnapshot(saved);
   } catch {
     state.itinerary = buildAutoItinerary(state.places);
   }
@@ -2347,6 +2455,171 @@ function formatRate(value = state.exchangeRate) {
 
 function rateSourceText() {
   return `${state.rateMeta.label} ${state.rateMeta.date}`;
+}
+
+function nowLabel() {
+  return new Date().toLocaleString("zh-TW", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function setSyncState(patch, shouldRender = true) {
+  state = { ...state, sync: normalizeSyncConfig({ ...state.sync, ...patch }) };
+  saveSyncConfig(state.sync);
+  if (shouldRender) render();
+}
+
+function commitDraftSyncSettings() {
+  if (state.editing?.type !== "trip") return state.sync;
+  const draft = state.editDraft;
+  const nextSync = normalizeSyncConfig({
+    ...state.sync,
+    enabled: Boolean(draft.syncEnabled),
+    url: draft.syncUrl?.trim() || "",
+    token: draft.syncToken?.trim() || "",
+    status: draft.syncUrl?.trim() ? state.sync.status || "同步設定已儲存" : "尚未設定同步",
+  });
+  state = { ...state, sync: nextSync };
+  saveSyncConfig(nextSync);
+  return nextSync;
+}
+
+function syncEndpointUrl(params = {}) {
+  const url = new URL(state.sync.url);
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, value);
+  });
+  if (state.sync.token) url.searchParams.set("token", state.sync.token);
+  return url.toString();
+}
+
+function jsonpRequest(url) {
+  return new Promise((resolve, reject) => {
+    const callback = `travelPlannerSync${Date.now()}${Math.round(Math.random() * 10000)}`;
+    const script = document.createElement("script");
+    const timeout = window.setTimeout(() => {
+      delete window[callback];
+      script.remove();
+      reject(new Error("同步讀取逾時"));
+    }, 12000);
+
+    window[callback] = (payload) => {
+      window.clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      resolve(payload);
+    };
+
+    script.addEventListener("error", () => {
+      window.clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      reject(new Error("同步讀取失敗"));
+    });
+
+    const requestUrl = new URL(url);
+    requestUrl.searchParams.set("callback", callback);
+    script.src = requestUrl.toString();
+    document.body.appendChild(script);
+  });
+}
+
+function scheduleCloudSave() {
+  if (!state.sync.enabled || !state.sync.url || syncSuspended) return;
+  window.clearTimeout(syncTimer);
+  syncTimer = window.setTimeout(() => {
+    pushCloudState();
+  }, 1400);
+}
+
+async function pushCloudState() {
+  commitDraftSyncSettings();
+  if (!state.sync.enabled || !state.sync.url) {
+    setSyncState({ status: "請先在設定中啟用同步" });
+    return;
+  }
+
+  const snapshot = buildStateSnapshot();
+  setSyncState({ busy: true, status: "正在上傳到雲端..." });
+
+  try {
+    await fetch(state.sync.url, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        token: state.sync.token,
+        updatedAt: snapshot.updatedAt,
+        data: snapshot,
+      }),
+    });
+
+    setSyncState({
+      busy: false,
+      lastPushedAt: nowLabel(),
+      status: "已上傳到雲端",
+    });
+  } catch {
+    setSyncState({
+      busy: false,
+      status: "上傳失敗，請檢查同步網址或網路",
+    });
+  }
+}
+
+async function pullCloudState(options = {}) {
+  commitDraftSyncSettings();
+  if (!state.sync.enabled || !state.sync.url) {
+    setSyncState({ status: "請先在設定中啟用同步" });
+    return;
+  }
+
+  setSyncState({ busy: true, status: "正在讀取雲端資料..." });
+
+  try {
+    const payload = await jsonpRequest(syncEndpointUrl({ action: "load" }));
+    if (!payload?.ok) throw new Error(payload?.error || "讀取失敗");
+    const remoteData = payload.data;
+
+    if (!remoteData) {
+      setSyncState({ busy: false, status: "雲端目前還沒有資料，請先上傳目前資料" });
+      return;
+    }
+
+    const remoteTime = Number(remoteData.updatedAt || payload.updatedAt || 0);
+    const localTime = Number(state.updatedAt || 0);
+    if (!options.force && hasSavedLocalState && remoteTime && remoteTime <= localTime) {
+      setSyncState({
+        busy: false,
+        lastPulledAt: nowLabel(),
+        status: "本機已是最新",
+      });
+      return;
+    }
+
+    const syncConfig = state.sync;
+    syncSuspended = true;
+    applyStateSnapshot(remoteData);
+    state = { ...state, sync: syncConfig };
+    saveState();
+    syncSuspended = false;
+    hasSavedLocalState = true;
+
+    setSyncState({
+      busy: false,
+      lastPulledAt: nowLabel(),
+      status: "已從雲端更新",
+    });
+  } catch {
+    syncSuspended = false;
+    setSyncState({
+      busy: false,
+      status: "讀取失敗，請檢查同步網址、同步代碼或 Google Apps Script 權限",
+    });
+  }
 }
 
 function mapsUrl(stops = getCurrentStops()) {
@@ -2509,6 +2782,9 @@ function openTripSettings() {
       tripTitle: state.tripTitle,
       tripDates: state.tripDates,
       exchangeRate: state.exchangeRate,
+      syncEnabled: state.sync.enabled,
+      syncUrl: state.sync.url,
+      syncToken: state.sync.token,
     },
   });
 }
@@ -2586,6 +2862,7 @@ function saveEdit() {
   const draft = state.editDraft;
 
   if (editing.type === "trip") {
+    const nextSync = commitDraftSyncSettings();
     setState({
       tripTitle: draft.tripTitle?.trim() || state.tripTitle,
       tripDates: draft.tripDates?.trim() || state.tripDates,
@@ -2594,6 +2871,7 @@ function saveEdit() {
         Number(draft.exchangeRate) && Number(draft.exchangeRate) !== state.exchangeRate
           ? { label: "手動設定", date: "可編輯", note: "由旅程設定更新" }
           : state.rateMeta,
+      sync: nextSync,
       modal: null,
       editing: null,
       editDraft: {},
@@ -3238,6 +3516,20 @@ function renderEditModal() {
           <label class="form-row">旅程名稱<input data-edit-field="tripTitle" value="${fieldValue("tripTitle")}" /></label>
           <label class="form-row">日期<input data-edit-field="tripDates" value="${fieldValue("tripDates")}" /></label>
           <label class="form-row">匯率<input data-edit-field="exchangeRate" inputmode="decimal" value="${fieldValue("exchangeRate")}" /></label>
+          <div class="sync-panel">
+            <h3>雲端同步</h3>
+            <label class="form-check"><input type="checkbox" data-edit-field="syncEnabled" ${state.editDraft.syncEnabled ? "checked" : ""} /> 啟用同網址同步</label>
+            <label class="form-row">同步網址<input data-edit-field="syncUrl" value="${fieldValue("syncUrl")}" placeholder="貼上 Google Apps Script Web App URL" /></label>
+            <label class="form-row">同步代碼<input data-edit-field="syncToken" value="${fieldValue("syncToken")}" placeholder="可自訂，例如 osaka2026" /></label>
+            <div class="sync-status">
+              <strong>${safe(state.sync.status)}</strong>
+              <span>${state.sync.lastPulledAt ? `下載 ${safe(state.sync.lastPulledAt)}` : "尚未下載"} · ${state.sync.lastPushedAt ? `上傳 ${safe(state.sync.lastPushedAt)}` : "尚未上傳"}</span>
+            </div>
+            <div class="sync-actions">
+              <button class="ghost-button" data-action="pullCloud" ${state.sync.busy ? "disabled" : ""}>從雲端下載</button>
+              <button class="ghost-button" data-action="pushCloud" ${state.sync.busy ? "disabled" : ""}>上傳目前資料</button>
+            </div>
+          </div>
           <button class="primary wide" data-action="saveEdit">儲存修改</button>
         </section>
       </div>
@@ -3702,6 +3994,8 @@ document.addEventListener("click", (event) => {
   if (action === "importPlaces") importPlaces();
   if (action === "autoArrange") autoArrange();
   if (action === "openTripSettings") openTripSettings();
+  if (action === "pullCloud") pullCloudState({ force: true });
+  if (action === "pushCloud") pushCloudState();
   if (action === "openLedger") setState({ modal: "ledger", activeSection: "expense" });
   if (action === "openAdd") setState({ modal: "add" });
   if (action === "addKind") setState({ addKind: target.dataset.kind });
@@ -3750,6 +4044,9 @@ document.addEventListener("input", (event) => {
 
 render();
 requestAnimationFrame(syncActiveDateTab);
+window.setTimeout(() => {
+  if (state.sync.enabled && state.sync.url) pullCloudState();
+}, 600);
 </script>
   </body>
 </html>
